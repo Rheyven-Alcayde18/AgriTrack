@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AgriTrack | Login</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+
+<body>
+
+<div class="login-wrapper">
+
+    <!-- =========================
+         LEFT BRAND SECTION
+    ========================== -->
+
+    <div class="brand-section">
+
+        <div class="brand-logo">
+            <i class="bi bi-flower1"></i>
+            <span>AgriTrack</span>
+        </div>
+
+        <div class="brand-content">
+
+            <span class="welcome-label">
+                SMART FARM MANAGEMENT
+            </span>
+
+            <h1>
+                Grow smarter.<br>
+                <em>Harvest better.</em>
+            </h1>
+
+            <p>
+                Monitor your crops, stay updated with weather
+                conditions, and make better farming decisions
+                with AgriTrack.
+            </p>
+
+            <div class="feature-list">
+
+                <div>
+                    <i class="bi bi-cloud-sun"></i>
+                    Weather Forecast
+                </div>
+
+                <div>
+                    <i class="bi bi-flower2"></i>
+                    Crop Monitoring
+                </div>
+
+                <div>
+                    <i class="bi bi-calendar-check"></i>
+                    Harvest Management
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="brand-footer">
+            © 2026 AgriTrack. All rights reserved.
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         RIGHT LOGIN SECTION
+    ========================== -->
+
+    <div class="form-section">
+
+        <div class="login-card">
+
+            <!-- Mobile Logo -->
+
+            <div class="mobile-logo">
+                <i class="bi bi-flower1"></i>
+                AgriTrack
+            </div>
+
+
+            <!-- Heading -->
+
+            <div class="form-heading">
+
+                <span class="small-label">
+                    WELCOME BACK
+                </span>
+
+                <h2>Sign in to your account</h2>
+
+                <p>
+                    Enter your credentials to access your account.
+                </p>
+
+            </div>
+
+
+            <!-- LOGIN FORM -->
+
+            <form id="loginForm">
+
+                <!-- Email -->
+
+                <div class="mb-4">
+
+                    <label for="email" class="form-label">
+                        Email Address
+                    </label>
+
+                    <div class="input-container">
+
+                        <i class="bi bi-envelope"></i>
+
+                        <input
+                            type="email"
+                            id="email"
+                            class="form-control"
+                            placeholder="Enter your email"
+                            autocomplete="username"
+                            required>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Password -->
+
+                <div class="mb-3">
+
+                    <label for="password" class="form-label">
+                        Password
+                    </label>
+
+                    <div class="input-container">
+
+                        <i class="bi bi-lock"></i>
+
+                        <input
+                            type="password"
+                            id="password"
+                            class="form-control"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required>
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="togglePassword"
+                            aria-label="Show password">
+
+                            <i class="bi bi-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Remember and Forgot Password -->
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+
+                    <div class="form-check">
+
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="remember">
+
+                        <label
+                            class="form-check-label"
+                            for="remember">
+
+                            Remember me
+
+                        </label>
+
+                    </div>
+
+                    <a
+                        href="#"
+                        id="forgotPassword"
+                        class="forgot-link">
+
+                        Forgot password?
+
+                    </a>
+
+                </div>
+
+
+                <!-- ERROR / SUCCESS MESSAGE -->
+
+                <div
+                    id="errorMessage"
+                    class="alert d-none"
+                    role="alert"
+                    aria-live="polite">
+                </div>
+
+
+                <!-- LOGIN BUTTON -->
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="login-btn">
+
+                    <span id="buttonText">
+                        Sign In
+                    </span>
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </button>
+
+            </form>
+
+
+            <!-- REGISTER ACCOUNT LINK (moved inside the card) -->
+
+            <div class="register-section">
+
+                <p>
+                    Don't have an account?
+                    <a href="register.html" class="register-link">
+                        Create an account
+                    </a>
+                </p>
+
+            </div>
+
+
+            <!-- DIVIDER -->
+
+            <div class="divider">
+
+                <span>SECURE FARM MANAGEMENT</span>
+
+            </div>
+
+
+            <!-- SECURITY NOTE -->
+
+            <div class="security-note">
+
+                <i class="bi bi-shield-check"></i>
+
+                Your account is protected through secure authentication.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     FIREBASE AUTHENTICATION
+========================== -->
+
+<script type="module">
+
+// IMPORT FIREBASE CONNECTION
+
+import {
+    auth,
+    database
+} from "./assets/js/firebase.js";
+
+
+// IMPORT FIREBASE AUTHENTICATION FUNCTIONS
+
+import {
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+    signOut
+} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+
+// IMPORT FIREBASE DATABASE FUNCTIONS
+
+import {
+    ref,
+    get
+} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+
+// =========================
+// ELEMENT REFERENCES
+// =========================
+
+const loginForm = document.getElementById("loginForm");
+
+const emailInput = document.getElementById("email");
+
+const passwordInput = document.getElementById("password");
+
+const togglePassword = document.getElementById("togglePassword");
+
+const loginButton = document.getElementById("loginButton");
+
+const buttonText = document.getElementById("buttonText");
+
+const errorMessage = document.getElementById("errorMessage");
+
+const forgotPassword = document.getElementById("forgotPassword");
+
+
+// =========================
+// MESSAGE DISPLAY
+// =========================
+
+function showMessage(message, type = "danger") {
+
+    errorMessage.textContent = message;
+
+    errorMessage.className = "alert alert-" + type;
+
+}
+
+
+// =========================
+// PASSWORD VISIBILITY
+// =========================
+
+togglePassword.addEventListener("click", function () {
+
+    const isHidden = passwordInput.type === "password";
+
+    passwordInput.type = isHidden ? "text" : "password";
+
+    togglePassword.innerHTML = isHidden
+        ? '<i class="bi bi-eye-slash"></i>'
+        : '<i class="bi bi-eye"></i>';
+
+    togglePassword.setAttribute(
+        "aria-label",
+        isHidden ? "Hide password" : "Show password"
+    );
+
+});
+
+
+// =========================
+// LOGIN FUNCTION
+// =========================
+
+loginForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const email = emailInput.value.trim();
+
+    const password = passwordInput.value;
+
+    // Clear previous messages
+
+    errorMessage.className = "alert d-none";
+
+    // Disable button
+
+    loginButton.disabled = true;
+
+    buttonText.textContent = "Signing in...";
+
+
+    try {
+
+        // STEP 1: FIREBASE AUTHENTICATION
+
+        const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+        const user = userCredential.user;
+
+
+        // STEP 2: GET USER ROLE FROM DATABASE
+
+        const roleReference = ref(
+            database,
+            "users/" + user.uid + "/role"
+        );
+
+        const roleSnapshot = await get(roleReference);
+
+
+        // STEP 3: CHECK USER ROLE
+
+        if (!roleSnapshot.exists()) {
+
+            throw new Error(
+                "Your account has no assigned role. Please contact the administrator."
+            );
+
+        }
+
+        const role = roleSnapshot.val();
+
+
+        // STEP 4: REDIRECT USER
+
+        if (role === "admin") {
+
+            window.location.href = "admin/dashboard.php";
+
+        }
+
+        else if (role === "user") {
+
+            window.location.href = "user/dashboard.php";
+
+        }
+
+        else {
+
+            throw new Error(
+                "Invalid account role. Please contact the administrator."
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error("AgriTrack Login Error:", error);
+
+        // ERROR MESSAGES
+
+        const errorMessages = {
+
+            "auth/invalid-credential":
+                "Incorrect email or password.",
+
+            "auth/invalid-email":
+                "Please enter a valid email address.",
+
+            "auth/too-many-requests":
+                "Too many login attempts. Please try again later.",
+
+            "auth/network-request-failed":
+                "Network error. Please check your internet connection.",
+
+            "auth/user-disabled":
+                "Your account has been disabled."
+
+        };
+
+
+        const message =
+            errorMessages[error.code] ||
+            error.message ||
+            "Unable to sign in. Please try again.";
+
+
+        showMessage(message, "danger");
+
+
+        // SIGN OUT IF ROLE CHECK FAILS
+
+        if (auth.currentUser) {
+
+            try {
+
+                await signOut(auth);
+
+            }
+
+            catch (signOutError) {
+
+                console.error("Sign out error:", signOutError);
+
+            }
+
+        }
+
+    }
+
+    finally {
+
+        loginButton.disabled = false;
+
+        buttonText.textContent = "Sign In";
+
+    }
+
+});
+
+
+// =========================
+// FORGOT PASSWORD
+// =========================
+
+forgotPassword.addEventListener("click", async function (event) {
+
+    event.preventDefault();
+
+    const email = emailInput.value.trim();
+
+
+    if (!email) {
+
+        showMessage(
+            "Please enter your email address first.",
+            "warning"
+        );
+
+        emailInput.focus();
+
+        return;
+
+    }
+
+
+    try {
+
+        await sendPasswordResetEmail(auth, email);
+
+        showMessage(
+            "Password reset instructions have been sent to your email.",
+            "success"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error("Password Reset Error:", error);
+
+        showMessage(
+            "Unable to send password reset email. Please check your email and try again.",
+            "danger"
+        );
+
+    }
+
+});
+
+
+// =========================
+// FIREBASE INITIALIZATION
+// =========================
+
+console.log("AgriTrack Login Page Loaded.");
+
+console.log("Firebase Authentication Initialized.");
+
+</script>
+
+</body>
+</html>
