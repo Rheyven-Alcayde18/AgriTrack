@@ -1,0 +1,42 @@
+AgriTrack/
+│
+├── index.html
+├── register.html
+│
+├── assets/
+│   ├── css/
+│   │   ├── style.css
+│   │   ├── dashboard.css
+│   │   ├── crops.css
+│   │   └── admin.css
+│   │
+│   ├── js/
+│   │   ├── firebase.js
+│   │   ├── auth.js
+│   │   ├── dashboard.js
+│   │   ├── weather.js
+│   │   ├── crops.js
+│   │   ├── harvest.js
+│   │   └── recommendations.js
+│   │
+│   └── images/
+│       ├── logo.png
+│       ├── farm-background.jpg
+│       └── crop-images/
+│
+├── user/
+│   ├── dashboard.php
+│   ├── crop-monitoring.php
+│   ├── weather-forecast.php
+│   ├── harvest-management.php
+│   ├── market-locations.php
+│   └── recommendations.php
+│
+├── admin/
+│   ├── dashboard.php
+│   ├── manage-farmers.php
+│   ├── manage-crops.php
+│   ├── reports.php
+│   └── settings.php
+│
+└── README.md
