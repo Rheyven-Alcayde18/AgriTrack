@@ -21,7 +21,7 @@ AgriTrack/
 │   │
 │   └── images/
 │       ├── logo.png
-│       ├── farm-background.jpg
+│       ├── farm-bg.jpg
 │       └── crop-images/
 │
 ├── user/
