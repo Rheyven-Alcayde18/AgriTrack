@@ -1,22 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Figtree:wght@400;500;600;700&display=swap");
 
-/* =========================================
-   AGRITRACK - SHARED AUTH STYLESHEET (v2)
-   Used by index.html (login) and register.html
-   Same class names, so your HTML does not change.
-   Needs: assets/img/farm-bg.jpg
-
-   What changed:
-   - Register now uses the exact same layout, spacing and
-     rhythm as login. It auto-detects itself with :has(),
-     so it just becomes slightly denser to fit without cutting
-     off the "Create account" button.
-   - The form panel can no longer clip content: card height is
-     min-content, and a slim scrollbar appears only if the window
-     is really short.
-   - Stronger photo fade for readable text, softer panel,
-     clearer focus states.
-========================================= */
 
 :root {
     --forest-900: #08301d;
@@ -980,11 +963,6 @@ input::-webkit-contacts-auto-fill-button {
 }
 
 
-/* =========================================================
-   TYPE LAYER (v4): Bricolage Grotesque + Figtree
-   Heavier, tighter display type gives the page weight and
-   personality; Figtree keeps the form text friendly and clear.
-========================================================= */
 
 .mobile-logo {
     font-weight: 800;
@@ -1030,13 +1008,6 @@ input::-webkit-contacts-auto-fill-button {
 .feature-list div,
 .feature-list li { font-weight: 700; letter-spacing: 0.1px; }
 
-
-/* =========================================================
-   GREEN THEME + ICON LAYER (v5)
-   Palette: deep emerald (#08301d / #0d4529) for depth,
-   leaf green (#1a8348) for actions, fresh lime (#8bd63f)
-   as the single bright accent.
-========================================================= */
 
 /* ---------- richer photo grading: emerald shadows ---------- */
 
