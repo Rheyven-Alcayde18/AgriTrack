@@ -1,38 +1,40 @@
 AgriTrack/
 │
-├── index.html
-├── register.html
+├── index.html                      (unchanged) landing / login page
+├── register.html                   (unchanged) sign-up page
 │
 ├── assets/
 │   ├── css/
-│   │   ├── style.css
-│   │   ├── dashboard.css
-│   │   ├── crops.css
-│   │   └── admin.css
+│   │   ├── style.css               (unchanged) styles for index / register
+│   │   ├── dashboard.css           (unchanged) sidebar + dashboard layout, shared by all user pages
+│   │   ├── crops.css               [PLANNED] page styles are inline for now
+│   │   └── admin.css               [PLANNED]
 │   │
 │   ├── js/
-│   │   ├── firebase.js
-│   │   ├── auth.js
-│   │   ├── dashboard.js
-│   │   ├── weather.js
-│   │   ├── crops.js
-│   │   ├── harvest.js
-│   │   └── recommendations.js
+│   │   ├── firebase.js             (unchanged) Firebase setup
+│   │   ├── auth.js                 (unchanged) sign-in check, welcome name, sign out
+│   │   ├── weather.js              [UPDATED] weather page: Open-Meteo search, forecast, saved location
+│   │   ├── dashboard.js            [PLANNED] dashboard weather script is inline for now
+│   │   ├── crops.js                [PLANNED] crop filter script is inline for now
+│   │   ├── harvest.js              [PLANNED] checklist script is inline for now
+│   │   └── recommendations.js      [PLANNED] rules engine is inline for now
 │   │
-│   └── images/
+│   └── images/                     your project shows "img"; keep whichever name you use
 │       ├── logo.png
 │       ├── farm-bg.jpg
 │       └── crop-images/
 │
 ├── user/
-│   ├── dashboard.php
-│   ├── crop-monitoring.php
-│   ├── weather-forecast.php
-│   ├── harvest-management.php
-│   ├── market-locations.php
-│   └── recommendations.php
+│   ├── dashboard.php               [UPDATED] stats and crop list from shared data, live weather panel
+│   ├── crop-monitoring.php         [NEW] growth stage, soil moisture, harvest dates, filters
+│   ├── weather-forecast.php        [UPDATED] redesigned: current conditions, farm advice, 7-day range bars
+│   ├── harvest-management.php      [NEW] timeline, schedule, prep checklist, past harvests
+│   ├── market-locations.php        [NEW] compare markets, net revenue, filters, saved markets, Leaflet map
+│   ├── recommendations.php         [NEW] prioritised daily actions from crops, forecast, markets
+│   ├── crops-data.php              [NEW] shared crop records (not a page)
+│   └── markets-data.php            [NEW] shared market listings (not a page)
 │
-├── admin/
+├── admin/                          [PLANNED] nothing built yet
 │   ├── dashboard.php
 │   ├── manage-farmers.php
 │   ├── manage-crops.php
