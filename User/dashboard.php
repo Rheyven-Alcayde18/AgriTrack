@@ -9,6 +9,8 @@ $icons = [
   'leaf'    => '<path d="M6 18c0-8 5-13 13-13 0 8-5 13-13 13Z"/><path d="M6 18 14 10"/>',
 ];
 function ic($k) { global $icons; return '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">' . $icons[$k] . '</svg>'; }
+function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+function num($n) { return rtrim(rtrim(number_format($n, 1), '0'), '.'); }
 
 $nav = [
   ['dashboard.php', 'Dashboard', 'home'],
@@ -18,30 +20,38 @@ $nav = [
   ['market-locations.php', 'Market locations', 'market'],
   ['recommendations.php', 'Recommendations', 'tips'],
 ];
+$current = 'dashboard.php';
 
 // Crop records shared with Crop monitoring and Harvest management (edit them in crops-data.php)
 require __DIR__ . '/crops-data.php';
 
-$numfmt = function ($n) { return rtrim(rtrim(number_format($n, 1), '0'), '.'); };
-$totalArea = 0; $totalYield = 0; $attention = 0;
-foreach ($crops as $c) {
+$today = new DateTime('today');
+$totalArea = 0; $totalYield = 0; $needWater = [];
+foreach ($crops as &$c) {
   $totalArea += $c['area'];
   $totalYield += $c['yield_t'];
-  if ($c['status'] === 'warn') $attention++;
+  $c['days'] = (int)$today->diff(new DateTime($c['harvest']))->format('%r%a');
+  if ($c['status'] === 'warn') $needWater[] = $c;
 }
+unset($c);
 $byHarvest = $crops;
 usort($byHarvest, function ($x, $y) { return strcmp($x['harvest'], $y['harvest']); });
 $nextCrop = $byHarvest[0];
 $fieldCount = count(array_unique(array_column($crops, 'field')));
 
+function daysText($d) { return $d > 0 ? 'In ' . $d . ' day' . ($d === 1 ? '' : 's') : ($d === 0 ? 'Today' : 'Ready now'); }
+
 $stats = [
-  ['Active crops', (string)count($crops), $attention ? $attention . ' need attention' : 'All on track', 'crop'],
-  ['Total area', $numfmt($totalArea) . ' ha', 'Across ' . $fieldCount . ' fields', 'market'],
-  ['Next harvest', date('M j', strtotime($nextCrop['harvest'])), $nextCrop['name'] . ', ' . $nextCrop['field'], 'harvest'],
-  ['Expected yield', $numfmt($totalYield) . ' t', 'Across ' . count($crops) . ' crops', 'tips'],
+  ['Active crops', (string)count($crops), count($needWater) ? count($needWater) . ' need attention' : 'All on track'],
+  ['Total area', num($totalArea) . ' ha', 'Across ' . $fieldCount . ' fields'],
+  ['Next harvest', date('M j', strtotime($nextCrop['harvest'])), $nextCrop['name'] . ', ' . $nextCrop['field']],
+  ['Expected yield', num($totalYield) . ' t', 'Across ' . count($crops) . ' crops'],
 ];
+
+// Sample data until your farm records are connected
 $yield = ['Jun' => 3.2, 'Jul' => 4.1, 'Aug' => 3.8, 'Sep' => 5.0, 'Oct' => 4.6, 'Nov' => 6.2];
 $max = max($yield);
+$lastMonth = array_key_last($yield);
 $tasks = [
   ['Water Field D', 'Today'],
   ['Apply fertilizer, Field B', 'Tomorrow'],
@@ -59,6 +69,107 @@ $tasks = [
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <style>
+    /* Dashboard page only. Every class is prefixed db- so nothing clashes with dashboard.css */
+    .db {
+      --ink: #12382a; --dark: #0c4a30; --green: #1a9d5c; --mint: #eef7f1;
+      --line: #e1eee6; --muted: #6b8a7a; --amber: #d99a00; --red: #d6453d;
+      color: var(--ink); font-variant-numeric: tabular-nums;
+    }
+    .db * { box-sizing: border-box; }
+    .db-head { margin-bottom: 22px; }
+    .db-head h1 { margin: 0 0 4px; }
+    .db-head p { margin: 0; color: var(--muted); }
+    .db-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 22px 24px; }
+    .db-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .db-card h2 { margin: 0; font-size: 1.1rem; color: var(--dark); }
+    .db-link { font-size: .84rem; font-weight: 700; color: var(--green); text-decoration: none; white-space: nowrap; }
+    .db-link:hover { text-decoration: underline; }
+
+    /* Attention banner */
+    .db-alert { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-bottom: 16px; padding: 14px 20px; border-radius: 16px; background: #fdf0ee; border-left: 5px solid var(--red); font-size: .92rem; color: #7a2c26; }
+    .db-alert b { color: #8f261f; }
+
+    /* Stats */
+    .db-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+    .db-stat { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
+    .db-stat small { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); }
+    .db-stat b { display: block; margin: 8px 0 2px; font-size: 1.7rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
+    .db-stat span { font-size: .82rem; color: var(--muted); }
+
+    /* Layout */
+    .db-cols { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+    .db-stack { display: grid; gap: 16px; }
+
+    /* Crop progress */
+    .db-crop { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 16px 0; border-top: 1px solid var(--line); }
+    .db-crop:first-of-type { border-top: 0; }
+    .db-crop b { display: block; color: var(--dark); font-size: 1rem; }
+    .db-crop small { color: var(--muted); font-size: .8rem; }
+    .db-bar { display: flex; align-items: center; gap: 12px; }
+    .db-bar .tr { flex: 1; height: 8px; border-radius: 99px; background: #e4efe8; overflow: hidden; }
+    .db-bar .tr i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #4cc088, #1a9d5c); }
+    .db-bar span { min-width: 38px; text-align: right; font-size: .86rem; font-weight: 700; color: var(--dark); }
+    .db-pill { font-size: .76rem; font-weight: 700; padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+    .db-pill.ok { background: #e3f4ea; color: #15753f; }
+    .db-pill.soon { background: #fdf2d6; color: #9a6a00; }
+    .db-pill.warn { background: #fde6e3; color: #b13a2f; }
+
+    /* Yield chart */
+    .db-chart { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; align-items: end; height: 210px; padding-top: 10px; }
+    .db-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
+    .db-col em { font-style: normal; font-size: .8rem; font-weight: 700; color: var(--muted); }
+    .db-col .bar { width: 100%; max-width: 54px; flex: none; border-radius: 10px 10px 4px 4px; background: #cfe9da; }
+    .db-col.now .bar { background: linear-gradient(180deg, #2bb56f, #0f6a42); }
+    .db-col.now em { color: var(--dark); }
+    .db-col small { font-size: .78rem; color: var(--muted); font-weight: 600; }
+
+    /* Weather */
+    .db-wx { position: relative; overflow: hidden; color: #fff; border: 0; background: linear-gradient(145deg, #1fa862 0%, #0f6a42 55%, #0c4a30 100%); }
+    .db-wx::before { content: ""; position: absolute; width: 200px; height: 200px; right: -60px; top: -80px; border-radius: 50%; background: rgba(255,255,255,.07); }
+    .db-wx > * { position: relative; }
+    .db-wx h2 { color: #fff; }
+    .db-wx .db-link { color: #b9f3d3; }
+    .db-wx-place { margin: 0; font-size: .86rem; opacity: .85; }
+    .db-wx-temp { margin: 10px 0 0; font-size: 3.4rem; font-weight: 800; letter-spacing: -2px; line-height: 1; }
+    .db-wx-cond { margin: 6px 0 0; font-weight: 700; }
+    .db-wx-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
+    .db-wx-stats div { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 10px 12px; }
+    .db-wx-stats small { display: block; font-size: .68rem; opacity: .8; margin-top: 3px; }
+    .db-wx-stats b { font-size: 1rem; font-weight: 800; }
+
+    /* Up next */
+    .db-next { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+    .db-next:first-of-type { border-top: 0; }
+    .db-date { text-align: center; border-radius: 14px; background: var(--mint); padding: 8px 0; }
+    .db-date small { display: block; font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--green); }
+    .db-date b { font-size: 1.3rem; color: var(--dark); line-height: 1.1; }
+    .db-next-info b { display: block; color: var(--dark); }
+    .db-next-info small { color: var(--muted); font-size: .8rem; }
+    .db-next-days { font-size: .8rem; font-weight: 700; color: var(--green); text-align: right; white-space: nowrap; }
+
+    /* To do */
+    .db-tasks { list-style: none; margin: 4px 0 0; padding: 0; }
+    .db-tasks li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+    .db-tasks li:first-child { border-top: 0; }
+    .db-tasks input { width: 18px; height: 18px; accent-color: var(--green); flex: none; cursor: pointer; }
+    .db-tasks label { flex: 1; cursor: pointer; font-size: .92rem; }
+    .db-tasks input:checked + label { color: var(--muted); text-decoration: line-through; }
+    .db-tasks small { color: var(--muted); font-size: .78rem; font-weight: 600; white-space: nowrap; }
+
+    .db-note { margin-top: 22px; font-size: .84rem; color: var(--muted); }
+
+    @media (max-width: 1100px) {
+      .db-stats { grid-template-columns: repeat(2, 1fr); }
+      .db-cols { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .db-card { padding: 18px; }
+      .db-crop { grid-template-columns: minmax(0, 1fr) auto; gap: 10px 12px; }
+      .db-crop .db-bar { grid-column: 1 / -1; order: 3; }
+      .db-chart { gap: 8px; }
+    }
+  </style>
 </head>
 <body>
 <div class="app">
@@ -66,83 +177,118 @@ $tasks = [
     <div class="brand"><span class="brand-mark"><?= ic('leaf') ?></span>AgriTrack</div>
     <nav class="menu" aria-label="Main">
       <?php foreach ($nav as [$href, $label, $icon]): ?>
-        <a href="<?= $href ?>" <?= $href === 'dashboard.php' ? 'class="active" aria-current="page"' : '' ?>><?= ic($icon) ?><?= $label ?></a>
+        <a href="<?= $href ?>" <?= $href === $current ? 'class="active" aria-current="page"' : '' ?>><?= ic($icon) ?><?= $label ?></a>
       <?php endforeach; ?>
     </nav>
     <button class="signout" id="logoutBtn" type="button">Sign out</button>
   </aside>
 
-  <main class="content">
-    <header class="head">
-      <div>
-        <h1 id="welcome">Loading...</h1>
-        <p><?= date('l, F j') ?>. Here is how your farm is doing today.</p>
-      </div>
+  <main class="content db">
+    <header class="db-head">
+      <h1 id="welcome">Loading...</h1>
+      <p><?= date('l, F j') ?>. Here is how your farm is doing today.</p>
     </header>
 
-    <section class="stats">
-      <?php foreach ($stats as [$label, $value, $note, $icon]): ?>
-        <div class="stat">
-          <span class="chip"><?= ic($icon) ?></span>
-          <p class="muted"><?= $label ?></p>
-          <strong><?= $value ?></strong>
-          <small><?= $note ?></small>
+    <?php if ($needWater): $w = $needWater[0]; ?>
+      <div class="db-alert">
+        <span><b><?= h($w['name']) ?> in <?= h($w['field']) ?> needs water.</b> Soil moisture is <?= (int)$w['moisture'] ?>%, below the healthy range.</span>
+        <a class="db-link" href="recommendations.php">See recommendations &rarr;</a>
+      </div>
+    <?php endif; ?>
+
+    <section class="db-stats">
+      <?php foreach ($stats as [$label, $value, $note]): ?>
+        <div class="db-stat">
+          <small><?= h($label) ?></small>
+          <b><?= h($value) ?></b>
+          <span><?= h($note) ?></span>
         </div>
       <?php endforeach; ?>
     </section>
 
-    <div class="cols">
-      <div class="stack">
-        <section class="panel">
-          <h2>Crop progress</h2>
-          <?php foreach ($crops as $cr): $name = $cr['name']; $field = $cr['field']; $stage = $cr['stage']; $pct = $cr['progress']; $status = $cr['label']; $cls = $cr['status']; ?>
-            <div class="crop">
-              <div><b><?= $name ?></b><small class="muted"><?= $field ?> &middot; <?= $stage ?></small></div>
-              <div class="bar" title="<?= $pct ?>% grown"><i style="width:<?= $pct ?>%"></i></div>
-              <span class="pill <?= $cls ?>"><?= $status ?></span>
+    <div class="db-cols">
+      <div class="db-stack">
+        <section class="db-card">
+          <div class="db-card-head">
+            <h2>Crop progress</h2>
+            <a class="db-link" href="crop-monitoring.php">View all &rarr;</a>
+          </div>
+          <?php foreach ($crops as $c): ?>
+            <div class="db-crop">
+              <div><b><?= h($c['name']) ?></b><small><?= h($c['field']) ?> &middot; <?= h($c['stage']) ?></small></div>
+              <div class="db-bar" title="<?= (int)$c['progress'] ?>% grown">
+                <div class="tr"><i style="width:<?= (int)$c['progress'] ?>%"></i></div>
+                <span><?= (int)$c['progress'] ?>%</span>
+              </div>
+              <span class="db-pill <?= h($c['status']) ?>"><?= h($c['label']) ?></span>
             </div>
           <?php endforeach; ?>
         </section>
 
-        <section class="panel">
-          <h2>Yield per month (tons)</h2>
-          <div class="chart">
+        <section class="db-card">
+          <div class="db-card-head">
+            <h2>Yield per month (tons)</h2>
+          </div>
+          <div class="db-chart">
             <?php foreach ($yield as $m => $v): ?>
-              <div class="col"><em><?= $v ?></em><span style="height:<?= round($v / $max * 100) ?>%"></span><small><?= $m ?></small></div>
+              <div class="db-col<?= $m === $lastMonth ? ' now' : '' ?>">
+                <em><?= h($v) ?></em>
+                <div class="bar" style="height:<?= round($v / $max * 150) ?>px"></div>
+                <small><?= h($m) ?></small>
+              </div>
             <?php endforeach; ?>
           </div>
         </section>
       </div>
 
-      <div class="stack">
-        <section class="panel weather">
-          <h2>Today's weather</h2>
-          <p id="dashPlace">--</p>
-          <div class="temp" id="dashTemp">--</div>
-          <p id="dashCondition">Loading...</p>
-          <ul>
-            <li><b id="dashRain">--</b> chance of rain</li>
-            <li><b id="dashHumidity">--</b> humidity</li>
-            <li><b id="dashWind">--</b> wind</li>
-          </ul>
+      <div class="db-stack">
+        <section class="db-card db-wx">
+          <div class="db-card-head">
+            <h2>Today's weather</h2>
+            <a class="db-link" href="weather-forecast.php">Forecast &rarr;</a>
+          </div>
+          <p class="db-wx-place" id="dashPlace">--</p>
+          <p class="db-wx-temp" id="dashTemp">--</p>
+          <p class="db-wx-cond" id="dashCondition">Loading...</p>
+          <div class="db-wx-stats">
+            <div><b id="dashRain">--</b><small>Chance of rain</small></div>
+            <div><b id="dashHumidity">--</b><small>Humidity</small></div>
+            <div><b id="dashWind">--</b><small>Wind</small></div>
+          </div>
         </section>
 
-        <section class="panel">
-          <h2>To do</h2>
-          <ul class="tasks">
+        <section class="db-card">
+          <div class="db-card-head">
+            <h2>Up next</h2>
+            <a class="db-link" href="harvest-management.php">Harvest plan &rarr;</a>
+          </div>
+          <?php foreach (array_slice($byHarvest, 0, 3) as $c): ?>
+            <div class="db-next">
+              <div class="db-date"><small><?= h(date('M', strtotime($c['harvest']))) ?></small><b><?= h(date('j', strtotime($c['harvest']))) ?></b></div>
+              <div class="db-next-info"><b><?= h($c['name']) ?></b><small><?= h($c['field']) ?> &middot; <?= h(num($c['yield_t'])) ?> t expected</small></div>
+              <span class="db-next-days"><?= h(daysText($c['days'])) ?></span>
+            </div>
+          <?php endforeach; ?>
+        </section>
+
+        <section class="db-card">
+          <div class="db-card-head">
+            <h2>To do</h2>
+          </div>
+          <ul class="db-tasks">
             <?php foreach ($tasks as $i => [$t, $when]): ?>
-              <li><input type="checkbox" id="t<?= $i ?>"><label for="t<?= $i ?>"><?= $t ?></label><small class="muted"><?= $when ?></small></li>
+              <li><input type="checkbox" id="t<?= $i ?>" data-task="<?= h($t) ?>"><label for="t<?= $i ?>"><?= h($t) ?></label><small><?= h($when) ?></small></li>
             <?php endforeach; ?>
           </ul>
         </section>
       </div>
     </div>
-    <p class="note muted">Crop, area and yield figures are sample data until your farm records are connected. Weather is live.</p>
+
+    <p class="db-note">Crop, area and yield figures are sample data until your farm records are connected. Weather is live.</p>
   </main>
 </div>
 
 <script type="module" src="../assets/js/auth.js"></script>
-
 <script src="../assets/js/dashboard.js"></script>
 </body>
 </html>
