@@ -292,18 +292,6 @@ $stats = [
 </div>
 
 <script type="module" src="../assets/js/auth.js"></script>
-<script>
-(function () {
-  // Remember ticked tasks on this device (light convenience only)
-  var boxes = document.querySelectorAll('.hm-group input[type="checkbox"]');
-  boxes.forEach(function (box) {
-    var key = box.getAttribute('data-key');
-    try { box.checked = localStorage.getItem(key) === '1'; } catch (e) {}
-    box.addEventListener('change', function () {
-      try { localStorage.setItem(key, box.checked ? '1' : '0'); } catch (e) {}
-    });
-  });
-})();
-</script>
+<script src="../assets/js/harvest.js"></script>
 </body>
 </html>

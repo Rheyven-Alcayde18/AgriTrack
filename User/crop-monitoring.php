@@ -21,8 +21,15 @@ $nav = [
 ];
 $current = 'crop-monitoring.php';
 
-// Shared crop data (also used by harvest-management.php). Edit it in crops-data.php
-require __DIR__ . '/crops-data.php';
+// Sample data. Replace with your Firestore/database records later.
+// status: ok = on track, soon = harvest soon, warn = needs attention
+$stages = ['Seedling', 'Vegetative', 'Flowering', 'Fruiting', 'Harvest ready'];
+$crops = [
+  ['name' => 'Rice',     'field' => 'Field A', 'area' => 5.0, 'stage' => 'Flowering',  'progress' => 72, 'planted' => '2026-07-27', 'harvest' => '2026-11-24', 'moisture' => 82, 'status' => 'ok',   'label' => 'On track',     'action' => 'Inspect flowering on Friday and keep water level steady.'],
+  ['name' => 'Corn',     'field' => 'Field B', 'area' => 3.5, 'stage' => 'Vegetative', 'progress' => 45, 'planted' => '2026-09-20', 'harvest' => '2027-01-08', 'moisture' => 61, 'status' => 'ok',   'label' => 'On track',     'action' => 'Apply fertilizer tomorrow.'],
+  ['name' => 'Tomato',   'field' => 'Field C', 'area' => 2.0, 'stage' => 'Fruiting',   'progress' => 88, 'planted' => '2026-08-30', 'harvest' => '2026-11-12', 'moisture' => 54, 'status' => 'soon', 'label' => 'Harvest soon', 'action' => 'Book transport and prepare crates for picking.'],
+  ['name' => 'Eggplant', 'field' => 'Field D', 'area' => 2.0, 'stage' => 'Seedling',   'progress' => 18, 'planted' => '2026-10-25', 'harvest' => '2027-02-10', 'moisture' => 28, 'status' => 'warn', 'label' => 'Needs water',  'action' => 'Water today. Soil moisture is below the healthy range.'],
+];
 
 $today = new DateTime('today');
 $totalArea = 0; $attention = 0; $soon = 0;
@@ -139,9 +146,6 @@ $stats = [
     .cm-card[data-status="warn"] .cm-action { background: #fdeeec; }
     .cm-card[data-status="soon"] .cm-action { background: #fdf6e0; }
 
-    .cm-link { display: inline-block; margin-top: 12px; font-size: .84rem; font-weight: 700; color: var(--green); text-decoration: none; }
-    .cm-link:hover { text-decoration: underline; }
-    .cm-card:target { box-shadow: 0 0 0 3px rgba(26,157,92,.35); }
     .cm-empty { display: none; padding: 40px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: 20px; }
     .cm-note { margin-top: 24px; font-size: .84rem; color: var(--muted); }
 
@@ -199,7 +203,7 @@ $stats = [
 
     <section class="cm-grid" id="cropGrid">
       <?php foreach ($crops as $c): ?>
-        <article class="cm-card" id="crop-<?= h($c['id']) ?>" data-status="<?= h($c['status']) ?>">
+        <article class="cm-card" data-status="<?= h($c['status']) ?>">
           <div class="cm-top">
             <div class="cm-name">
               <span class="cm-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><?= $icons['crop'] ?></svg></span>
@@ -241,7 +245,6 @@ $stats = [
           </div>
 
           <p class="cm-action"><b>Next:</b> <?= h($c['action']) ?></p>
-          <a class="cm-link" href="harvest-management.php#crop-<?= h($c['id']) ?>">View in harvest plan &rarr;</a>
         </article>
       <?php endforeach; ?>
     </section>
@@ -252,26 +255,6 @@ $stats = [
 </div>
 
 <script type="module" src="../assets/js/auth.js"></script>
-<script>
-(function () {
-  var buttons = document.querySelectorAll('.cm-filter');
-  var cards = document.querySelectorAll('.cm-card');
-  var empty = document.getElementById('empty');
-
-  buttons.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var f = btn.getAttribute('data-filter');
-      var shown = 0;
-      buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
-      cards.forEach(function (card) {
-        var match = f === 'all' || card.getAttribute('data-status') === f;
-        card.hidden = !match;
-        if (match) shown++;
-      });
-      empty.style.display = shown ? 'none' : 'block';
-    });
-  });
-})();
-</script>
+<script src="../assets/js/crops.js"></script>
 </body>
 </html>
