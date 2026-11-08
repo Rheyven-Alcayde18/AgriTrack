@@ -19,26 +19,34 @@ $nav = [
   ['recommendations.php', 'Recommendations', 'tips'],
 ];
 
-// Sample data. Replace with your Firestore/database records later.
+// Crop records shared with Crop monitoring and Harvest management (edit them in crops-data.php)
+require __DIR__ . '/crops-data.php';
+
+$numfmt = function ($n) { return rtrim(rtrim(number_format($n, 1), '0'), '.'); };
+$totalArea = 0; $totalYield = 0; $attention = 0;
+foreach ($crops as $c) {
+  $totalArea += $c['area'];
+  $totalYield += $c['yield_t'];
+  if ($c['status'] === 'warn') $attention++;
+}
+$byHarvest = $crops;
+usort($byHarvest, function ($x, $y) { return strcmp($x['harvest'], $y['harvest']); });
+$nextCrop = $byHarvest[0];
+$fieldCount = count(array_unique(array_column($crops, 'field')));
+
 $stats = [
-  ['Active crops', '6', '2 need attention', 'crop'],
-  ['Total area', '12.5 ha', 'Across 4 fields', 'market'],
-  ['Next harvest', 'Nov 24', 'Rice, Field A', 'harvest'],
-  ['Expected yield', '8.4 t', '+6% vs last season', 'tips'],
-];
-$crops = [
-  ['Rice', 'Field A', 'Flowering', 72, 'On track', 'ok'],
-  ['Corn', 'Field B', 'Vegetative', 45, 'On track', 'ok'],
-  ['Tomato', 'Field C', 'Fruiting', 88, 'Harvest soon', 'soon'],
-  ['Eggplant', 'Field D', 'Seedling', 18, 'Needs water', 'warn'],
+  ['Active crops', (string)count($crops), $attention ? $attention . ' need attention' : 'All on track', 'crop'],
+  ['Total area', $numfmt($totalArea) . ' ha', 'Across ' . $fieldCount . ' fields', 'market'],
+  ['Next harvest', date('M j', strtotime($nextCrop['harvest'])), $nextCrop['name'] . ', ' . $nextCrop['field'], 'harvest'],
+  ['Expected yield', $numfmt($totalYield) . ' t', 'Across ' . count($crops) . ' crops', 'tips'],
 ];
 $yield = ['Jun' => 3.2, 'Jul' => 4.1, 'Aug' => 3.8, 'Sep' => 5.0, 'Oct' => 4.6, 'Nov' => 6.2];
 $max = max($yield);
 $tasks = [
   ['Water Field D', 'Today'],
   ['Apply fertilizer, Field B', 'Tomorrow'],
-  ['Inspect rice flowering', 'Friday'],
-  ['Book transport for tomatoes', 'Saturday'],
+  ['Inspect the rice field', 'Friday'],
+  ['Book transport for tomatoes', 'Tuesday'],
 ];
 ?>
 <!DOCTYPE html>
@@ -87,7 +95,7 @@ $tasks = [
       <div class="stack">
         <section class="panel">
           <h2>Crop progress</h2>
-          <?php foreach ($crops as [$name, $field, $stage, $pct, $status, $cls]): ?>
+          <?php foreach ($crops as $cr): $name = $cr['name']; $field = $cr['field']; $stage = $cr['stage']; $pct = $cr['progress']; $status = $cr['label']; $cls = $cr['status']; ?>
             <div class="crop">
               <div><b><?= $name ?></b><small class="muted"><?= $field ?> &middot; <?= $stage ?></small></div>
               <div class="bar" title="<?= $pct ?>% grown"><i style="width:<?= $pct ?>%"></i></div>
