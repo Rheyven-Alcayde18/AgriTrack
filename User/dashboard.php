@@ -109,12 +109,13 @@ $tasks = [
       <div class="stack">
         <section class="panel weather">
           <h2>Today's weather</h2>
-          <div class="temp">29&deg;C</div>
-          <p>Partly cloudy</p>
+          <p id="dashPlace">--</p>
+          <div class="temp" id="dashTemp">--</div>
+          <p id="dashCondition">Loading...</p>
           <ul>
-            <li><b>40%</b> chance of rain</li>
-            <li><b>78%</b> humidity</li>
-            <li><b>12 km/h</b> wind</li>
+            <li><b id="dashRain">--</b> chance of rain</li>
+            <li><b id="dashHumidity">--</b> humidity</li>
+            <li><b id="dashWind">--</b> wind</li>
           </ul>
         </section>
 
@@ -128,9 +129,63 @@ $tasks = [
         </section>
       </div>
     </div>
-    <p class="note muted">Figures shown are sample data until your farm records are connected.</p>
+    <p class="note muted">Crop, area and yield figures are sample data until your farm records are connected. Weather is live.</p>
   </main>
 </div>
+
 <script type="module" src="../assets/js/auth.js"></script>
+
+<!-- Self-contained: reads the place saved by the Weather forecast page -->
+<script>
+(function () {
+  var KEY = 'agritrack.location';
+  var DEFAULT = { name: 'Bay, Laguna, Philippines', lat: 14.1833, lon: 121.2833 };
+  var $ = function (id) { return document.getElementById(id); };
+
+  function getLocation() {
+    try {
+      var v = JSON.parse(localStorage.getItem(KEY));
+      if (v && isFinite(v.lat) && isFinite(v.lon) && v.name) return v;
+    } catch (e) {}
+    return DEFAULT;
+  }
+
+  function describe(code) {
+    if (code === 0) return 'Clear sky';
+    if (code <= 2) return 'Partly cloudy';
+    if (code === 3) return 'Overcast';
+    if (code <= 48) return 'Foggy';
+    if (code <= 57) return 'Drizzle';
+    if (code <= 67) return 'Rain';
+    if (code <= 77) return 'Snow';
+    if (code <= 82) return 'Rain showers';
+    if (code <= 86) return 'Snow showers';
+    return 'Thunderstorm';
+  }
+
+  var loc = getLocation();
+  $('dashPlace').textContent = loc.name;
+
+  var url = 'https://api.open-meteo.com/v1/forecast'
+    + '?latitude=' + loc.lat + '&longitude=' + loc.lon
+    + '&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m'
+    + '&daily=precipitation_probability_max&timezone=auto&forecast_days=1';
+
+  fetch(url)
+    .then(function (r) { if (!r.ok) throw new Error('bad response'); return r.json(); })
+    .then(function (d) {
+      var c = d.current;
+      var rain = d.daily.precipitation_probability_max[0];
+      $('dashTemp').textContent = Math.round(c.temperature_2m) + '\u00B0C';
+      $('dashCondition').textContent = describe(c.weather_code);
+      $('dashRain').textContent = (rain == null ? 0 : rain) + '%';
+      $('dashHumidity').textContent = c.relative_humidity_2m + '%';
+      $('dashWind').textContent = Math.round(c.wind_speed_10m) + ' km/h';
+    })
+    .catch(function () {
+      $('dashCondition').textContent = 'Weather unavailable';
+    });
+})();
+</script>
 </body>
 </html>
