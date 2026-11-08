@@ -1,0 +1,18 @@
+<?php
+// Shared market listings, used by market-locations.php AND recommendations.php.
+// Edit a market here and both pages update. Replace with real records later.
+//
+// Sample market listings. Locations are approximate and prices/hours are examples:
+// confirm with the market before you deliver. Replace with real records later.
+// prices = what the market pays per kg for each crop (PHP). days: 0 = Sunday ... 6 = Saturday
+$all = [0, 1, 2, 3, 4, 5, 6];
+$markets = [
+  ['id' => 'bay-pm',      'name' => 'Bay Public Market',                 'short' => 'Bay PM',       'type' => 'public',    'town' => 'Bay, Laguna',         'lat' => 14.1850, 'lon' => 121.2850, 'days' => $all, 'from' => '05:00', 'to' => '16:00', 'prices' => ['tomato' => 38, 'eggplant' => 42, 'corn' => 13],                  'note' => 'Closest market. Retail buyers and resellers.'],
+  ['id' => 'lb-pm',       'name' => 'Los Baños Public Market',           'short' => 'Los Baños PM', 'type' => 'public',    'town' => 'Los Baños, Laguna',   'lat' => 14.1699, 'lon' => 121.2415, 'days' => $all, 'from' => '05:00', 'to' => '17:00', 'prices' => ['tomato' => 40, 'eggplant' => 44, 'corn' => 14],                  'note' => 'Steady demand from the town and nearby campuses.'],
+  ['id' => 'calauan-pm',  'name' => 'Calauan Public Market',             'short' => 'Calauan PM',   'type' => 'public',    'town' => 'Calauan, Laguna',     'lat' => 14.1450, 'lon' => 121.3171, 'days' => $all, 'from' => '04:30', 'to' => '15:00', 'prices' => ['tomato' => 36, 'eggplant' => 40, 'corn' => 13],                  'note' => 'Busiest in the early morning.'],
+  ['id' => 'sanpablo-pm', 'name' => 'San Pablo City Public Market',      'short' => 'San Pablo PM', 'type' => 'public',    'town' => 'San Pablo City',      'lat' => 14.0689, 'lon' => 121.3256, 'days' => $all, 'from' => '04:00', 'to' => '18:00', 'prices' => ['tomato' => 44, 'eggplant' => 48, 'corn' => 15],                  'note' => 'Larger market with higher prices and more buyers.'],
+  ['id' => 'calauan-coop','name' => 'Calauan Farmers Cooperative Station','short' => 'Calauan Coop', 'type' => 'coop',      'town' => 'Calauan, Laguna',     'lat' => 14.1500, 'lon' => 121.3050, 'days' => [1, 2, 3, 4, 5, 6], 'from' => '07:00', 'to' => '16:00', 'prices' => ['rice' => 21, 'corn' => 15],               'note' => 'Buys palay and corn from members. Bring your ID.'],
+  ['id' => 'pila-rice',   'name' => 'Pila Rice Buying Station',          'short' => 'Pila Rice',    'type' => 'coop',      'town' => 'Pila, Laguna',        'lat' => 14.2333, 'lon' => 121.3667, 'days' => [1, 2, 3, 4, 5, 6], 'from' => '07:00', 'to' => '17:00', 'prices' => ['rice' => 22],                                    'note' => 'Rice only. Best palay price nearby.'],
+  ['id' => 'stacruz-hub', 'name' => 'Santa Cruz Wholesale Trading Post', 'short' => 'Sta. Cruz Hub','type' => 'wholesale', 'town' => 'Santa Cruz, Laguna',  'lat' => 14.2781, 'lon' => 121.4161, 'days' => $all, 'from' => '20:00', 'to' => '05:00', 'prices' => ['tomato' => 46, 'eggplant' => 50, 'corn' => 16, 'rice' => 21], 'note' => 'Overnight trading. Bulk loads only.'],
+  ['id' => 'calamba-hub', 'name' => 'Calamba Wholesale Vegetable Hub',  'short' => 'Calamba Hub',  'type' => 'wholesale', 'town' => 'Calamba, Laguna',     'lat' => 14.2116, 'lon' => 121.1653, 'days' => $all, 'from' => '21:00', 'to' => '06:00', 'prices' => ['tomato' => 48, 'eggplant' => 52, 'corn' => 16],                  'note' => 'Top vegetable prices, but a longer haul.'],
+];

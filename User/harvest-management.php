@@ -135,6 +135,7 @@ $stats = [
     .hm-side small { display: block; color: var(--muted); font-size: .78rem; }
     .hm-link { display: inline-block; margin-top: 6px; font-size: .8rem; font-weight: 700; color: var(--green); text-decoration: none; }
     .hm-link:hover { text-decoration: underline; }
+    .hm-link + .hm-link { display: block; margin-top: 2px; }
 
     /* Prep checklist */
     .hm-prep h2 { margin-bottom: 4px; }
@@ -242,6 +243,7 @@ $stats = [
               <b><?= h($peso . number_format($c['revenue'])) ?></b>
               <small><?= h(daysText($c['days'])) ?></small>
               <a class="hm-link" href="crop-monitoring.php#crop-<?= h($c['id']) ?>">View in crop monitoring &rarr;</a>
+              <a class="hm-link" href="market-locations.php?crop=<?= h($c['id']) ?>">Find best market &rarr;</a>
             </div>
           </div>
         <?php endforeach; ?>
