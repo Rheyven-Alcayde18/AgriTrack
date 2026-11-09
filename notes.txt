@@ -1,42 +1,65 @@
 AgriTrack/
 │
-├── index.html
-├── register.html
+├── index.html                      (unchanged) landing / login page
+├── register.html                   (unchanged) sign-up page
 │
 ├── assets/
 │   ├── css/
-│   │   ├── style.css
-│   │   ├── dashboard.css
-│   │   ├── crops.css
-│   │   └── admin.css
+│   │   ├── style.css               (unchanged) styles for index / register
+│   │   ├── dashboard.css           (unchanged) sidebar + dashboard layout,
+│   │   │                           shared by all user pages
+│   │   ├── crops.css               [PLANNED] crop monitoring page styles
+│   │   └── admin.css               [PLANNED] administrator page styles
 │   │
 │   ├── js/
-│   │   ├── firebase.js
-│   │   ├── auth.js
-│   │   ├── dashboard.js
-│   │   ├── weather.js
-│   │   ├── crops.js
-│   │   ├── harvest.js
-│   │   └── recommendations.js
+│   │   ├── firebase.js             (unchanged) Firebase setup
+│   │   ├── auth.js                 (unchanged) sign-in check, welcome name,
+│   │   │                           and sign out
+│   │   ├── weather.js              [UPDATED] Open-Meteo search, forecast,
+│   │   │                           and saved location
+│   │   ├── dashboard.js            [PLANNED] dashboard weather script
+│   │   ├── crops.js                [PLANNED] crop filter script
+│   │   ├── harvest.js               [PLANNED] harvesting checklist script
+│   │   └── recommendations.js      [PLANNED] agricultural rules engine
 │   │
 │   └── images/
 │       ├── logo.png
-│       ├── farm-background.jpg
+│       ├── farm-bg.jpg
 │       └── crop-images/
 │
 ├── user/
-│   ├── dashboard.php
-│   ├── crop-monitoring.php
-│   ├── weather-forecast.php
-│   ├── harvest-management.php
-│   ├── market-locations.php
-│   └── recommendations.php
+│   ├── dashboard.php               [UPDATED] statistics, crop list,
+│   │                               and live weather panel
+│   │
+│   ├── crop-monitoring.php         [NEW] growth stages, soil moisture,
+│   │                               harvest dates, and filters
+│   │
+│   ├── weather-forecast.php        [UPDATED] current conditions,
+│   │                               farming advice, and 7-day forecast
+│   │
+│   ├── harvest-management.php      [NEW] harvesting timeline, schedules,
+│   │                               preparation checklist, and past harvests
+│   │
+│   ├── market-locations.php        [NEW] market comparison, net revenue,
+│   │                               filters, saved markets, and Leaflet map
+│   │
+│   ├── recommendations.php         [NEW] prioritized daily farming actions
+│   │                               based on crops, forecasts, and markets
+│   │
+│   ├── crops-data.php              [NEW] shared crop records (not a page)
+│   └── markets-data.php            [NEW] shared market listings (not a page)
 │
 ├── admin/
-│   ├── dashboard.php
-│   ├── manage-farmers.php
-│   ├── manage-crops.php
-│   ├── reports.php
-│   └── settings.php
+│   ├── dashboard.php               [PLANNED] overall system overview
+│   ├── manage-farmers.php          [PLANNED] farmer account management
+│   ├── manage-crops.php            [PLANNED] crop information management
+│   ├── manage-markets.php          [NEW] agricultural market management
+│   ├── manage-recommendations.php  [NEW] farming recommendation management
+│   ├── weather-alerts.php          [NEW] weather monitoring and
+│   │                               agricultural announcements
+│   ├── reports.php                 [PLANNED] reports and analytics
+│   ├── activity-logs.php           [NEW] administrator and farmer
+│   │                               activity records
+│   └── settings.php                [PLANNED] administrator and system settings
 │
 └── README.md

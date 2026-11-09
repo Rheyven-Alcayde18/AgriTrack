@@ -4,55 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sign in to AgriTrack to monitor your crops, weather and harvests.">
+    <meta name="theme-color" content="#0d4529">
 
-    <title>AgriTrack | Login</title>
+    <title>Login | AgriTrack</title>
 
-    <!-- Google Fonts -->
+    <!-- Favicon (inline, so the browser never asks for a missing favicon.ico) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%231a8348'/%3E%3Ctext x='50' y='68' font-size='56' text-anchor='middle'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+
+    <!-- Faster loading of fonts and icons (fonts are loaded from assets/css/style.css) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <!-- Bootstrap CSS -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Icons -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-        rel="stylesheet">
+    <!-- Phosphor Icons (duotone for decoration, bold for actions) -->
+    <link href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
-
 </head>
 
 <body>
 
 <div class="login-wrapper">
 
-    <!-- =========================
-         LEFT BRAND SECTION
-    ========================== -->
-
-    <div class="brand-section">
-
-        <div class="brand-logo">
-            <i class="bi bi-flower1"></i>
-            <span>AgriTrack</span>
-        </div>
+    <!-- LEFT BRAND SECTION (decorative photo + tagline) -->
+    <aside class="brand-section">
 
         <div class="brand-content">
 
-            <span class="welcome-label">
-                SMART FARM MANAGEMENT
-            </span>
-
             <h1>
                 Grow smarter.<br>
-                <em>Harvest better.</em>
+                <span>Harvest better.</span>
             </h1>
 
             <p>
@@ -62,300 +49,180 @@
             </p>
 
             <div class="feature-list">
-
-                <div>
-                    <i class="bi bi-cloud-sun"></i>
-                    Weather Forecast
-                </div>
-
-                <div>
-                    <i class="bi bi-flower2"></i>
-                    Crop Monitoring
-                </div>
-
-                <div>
-                    <i class="bi bi-calendar-check"></i>
-                    Harvest Management
-                </div>
-
+                <div><i class="ph-duotone ph-cloud-sun" aria-hidden="true"></i> Weather forecast</div>
+                <div><i class="ph-duotone ph-plant" aria-hidden="true"></i> Crop monitoring</div>
+                <div><i class="ph-duotone ph-grains" aria-hidden="true"></i> Harvest management</div>
+                <div><i class="ph-duotone ph-hand-heart" aria-hidden="true"></i> Farmer-friendly platform</div>
             </div>
 
         </div>
 
-        <div class="brand-footer">
+        <footer class="brand-footer">
             © 2026 AgriTrack. All rights reserved.
-        </div>
+        </footer>
 
-    </div>
+    </aside>
 
 
-    <!-- =========================
-         RIGHT LOGIN SECTION
-    ========================== -->
-
-    <div class="form-section">
+    <!-- RIGHT LOGIN SECTION -->
+    <main class="form-section">
 
         <div class="login-card">
 
-            <!-- Mobile Logo -->
-
             <div class="mobile-logo">
-                <i class="bi bi-flower1"></i>
+                <i class="ph-duotone ph-leaf" aria-hidden="true"></i>
                 AgriTrack
             </div>
 
-
-            <!-- Heading -->
-
             <div class="form-heading">
-
-                <span class="small-label">
-                    WELCOME BACK
-                </span>
-
+                <span class="small-label">Welcome back</span>
                 <h2>Sign in to your account</h2>
-
-                <p>
-                    Enter your credentials to access your account.
-                </p>
-
+                <p>Enter your credentials to access your account.</p>
             </div>
 
-
             <!-- LOGIN FORM -->
-
-            <form id="loginForm">
+            <form id="loginForm" autocomplete="off">
 
                 <!-- Email -->
-
                 <div class="mb-4">
-
-                    <label for="email" class="form-label">
-                        Email Address
-                    </label>
+                    <label for="email" class="form-label">Email address</label>
 
                     <div class="input-container">
-
-                        <i class="bi bi-envelope"></i>
+                        <i class="ph-duotone ph-envelope-simple" aria-hidden="true"></i>
 
                         <input
                             type="email"
                             id="email"
+                            name="email"
                             class="form-control"
                             placeholder="Enter your email"
-                            autocomplete="username"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            inputmode="email"
                             required>
-
                     </div>
-
                 </div>
 
-
                 <!-- Password -->
-
                 <div class="mb-3">
-
-                    <label for="password" class="form-label">
-                        Password
-                    </label>
+                    <label for="password" class="form-label">Password</label>
 
                     <div class="input-container">
-
-                        <i class="bi bi-lock"></i>
+                        <i class="ph-duotone ph-lock-key" aria-hidden="true"></i>
 
                         <input
                             type="password"
                             id="password"
+                            name="password"
                             class="form-control"
                             placeholder="Enter your password"
-                            autocomplete="current-password"
+                            autocomplete="new-password"
                             required>
 
                         <button
                             type="button"
                             class="password-toggle"
                             id="togglePassword"
-                            aria-label="Show password">
-
-                            <i class="bi bi-eye"></i>
-
+                            aria-label="Show password"
+                            aria-controls="password"
+                            aria-pressed="false">
+                            <i class="ph-bold ph-eye" aria-hidden="true"></i>
                         </button>
-
                     </div>
-
                 </div>
 
-
                 <!-- Remember and Forgot Password -->
-
                 <div class="d-flex justify-content-between align-items-center mb-4">
 
                     <div class="form-check">
-
-                        <input
-                            class="form-check-input"
-                            type="checkbox"
-                            id="remember">
-
-                        <label
-                            class="form-check-label"
-                            for="remember">
-
-                            Remember me
-
-                        </label>
-
+                        <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">Remember me</label>
                     </div>
 
-                    <a
-                        href="#"
-                        id="forgotPassword"
-                        class="forgot-link">
-
-                        Forgot password?
-
-                    </a>
+                    <a href="#" id="forgotPassword" class="forgot-link">Forgot password?</a>
 
                 </div>
-
 
                 <!-- ERROR / SUCCESS MESSAGE -->
-
-                <div
-                    id="errorMessage"
-                    class="alert d-none"
-                    role="alert"
-                    aria-live="polite">
-                </div>
-
+                <div id="errorMessage" class="alert d-none" role="alert" aria-live="polite"></div>
 
                 <!-- LOGIN BUTTON -->
-
-                <button
-                    type="submit"
-                    id="loginButton"
-                    class="login-btn">
-
-                    <span id="buttonText">
-                        Sign In
-                    </span>
-
-                    <i class="bi bi-arrow-right"></i>
-
+                <button type="submit" id="loginButton" class="login-btn">
+                    <span id="buttonText">Sign in</span>
+                    <i class="ph-bold ph-arrow-right" aria-hidden="true"></i>
                 </button>
 
             </form>
 
-
-            <!-- REGISTER ACCOUNT LINK (moved inside the card) -->
-
             <div class="register-section">
-
                 <p>
                     Don't have an account?
-                    <a href="register.html" class="register-link">
-                        Create an account
-                    </a>
+                    <a href="register.html" class="register-link">Create an account</a>
                 </p>
-
             </div>
-
-
-            <!-- DIVIDER -->
 
             <div class="divider">
-
-                <span>SECURE FARM MANAGEMENT</span>
-
+                <span>Secure farm management</span>
             </div>
 
-
-            <!-- SECURITY NOTE -->
-
             <div class="security-note">
-
-                <i class="bi bi-shield-check"></i>
-
+                <i class="ph-duotone ph-shield-check" aria-hidden="true"></i>
                 Your account is protected through secure authentication.
-
             </div>
 
         </div>
 
-    </div>
+    </main>
 
 </div>
 
 
-<!-- =========================
-     FIREBASE AUTHENTICATION
-========================== -->
-
+<!-- FIREBASE AUTHENTICATION -->
 <script type="module">
 
-// IMPORT FIREBASE CONNECTION
-
-import {
-    auth,
-    database
-} from "./assets/js/firebase.js";
-
-
-// IMPORT FIREBASE AUTHENTICATION FUNCTIONS
+import { auth, database } from "./assets/js/firebase.js";
 
 import {
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
+    setPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence,
     signOut
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-
-// IMPORT FIREBASE DATABASE FUNCTIONS
-
-import {
-    ref,
-    get
-} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { ref, get } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
 
-// =========================
 // ELEMENT REFERENCES
-// =========================
-
 const loginForm = document.getElementById("loginForm");
-
 const emailInput = document.getElementById("email");
-
 const passwordInput = document.getElementById("password");
-
+const rememberInput = document.getElementById("remember");
 const togglePassword = document.getElementById("togglePassword");
-
 const loginButton = document.getElementById("loginButton");
-
 const buttonText = document.getElementById("buttonText");
-
 const errorMessage = document.getElementById("errorMessage");
-
 const forgotPassword = document.getElementById("forgotPassword");
 
 
-// =========================
+// CLEAR AUTOFILLED VALUES (runs on every page load, including the back button)
+window.addEventListener("pageshow", function () {
+    setTimeout(function () {
+        loginForm.reset();
+    }, 100);
+});
+
+
 // MESSAGE DISPLAY
-// =========================
-
 function showMessage(message, type = "danger") {
-
     errorMessage.textContent = message;
-
     errorMessage.className = "alert alert-" + type;
-
 }
 
 
-// =========================
 // PASSWORD VISIBILITY
-// =========================
-
 togglePassword.addEventListener("click", function () {
 
     const isHidden = passwordInput.type === "password";
@@ -363,96 +230,60 @@ togglePassword.addEventListener("click", function () {
     passwordInput.type = isHidden ? "text" : "password";
 
     togglePassword.innerHTML = isHidden
-        ? '<i class="bi bi-eye-slash"></i>'
-        : '<i class="bi bi-eye"></i>';
+        ? '<i class="ph-bold ph-eye-slash" aria-hidden="true"></i>'
+        : '<i class="ph-bold ph-eye" aria-hidden="true"></i>';
 
-    togglePassword.setAttribute(
-        "aria-label",
-        isHidden ? "Hide password" : "Show password"
-    );
+    togglePassword.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+    togglePassword.setAttribute("aria-pressed", isHidden ? "true" : "false");
 
 });
 
 
-// =========================
 // LOGIN FUNCTION
-// =========================
-
 loginForm.addEventListener("submit", async function (event) {
 
     event.preventDefault();
 
     const email = emailInput.value.trim();
-
     const password = passwordInput.value;
-
-    // Clear previous messages
 
     errorMessage.className = "alert d-none";
 
-    // Disable button
-
     loginButton.disabled = true;
-
     buttonText.textContent = "Signing in...";
-
 
     try {
 
-        // STEP 1: FIREBASE AUTHENTICATION
-
-        const userCredential = await signInWithEmailAndPassword(
+        // STEP 0: "REMEMBER ME" (stay signed in after closing the browser, or only for this session)
+        await setPersistence(
             auth,
-            email,
-            password
+            rememberInput.checked ? browserLocalPersistence : browserSessionPersistence
         );
 
+        // STEP 1: FIREBASE AUTHENTICATION
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-
         // STEP 2: GET USER ROLE FROM DATABASE
-
-        const roleReference = ref(
-            database,
-            "users/" + user.uid + "/role"
-        );
-
+        const roleReference = ref(database, "users/" + user.uid + "/role");
         const roleSnapshot = await get(roleReference);
 
-
         // STEP 3: CHECK USER ROLE
-
         if (!roleSnapshot.exists()) {
-
-            throw new Error(
-                "Your account has no assigned role. Please contact the administrator."
-            );
-
+            throw new Error("Your account has no assigned role. Please contact the administrator.");
         }
 
         const role = roleSnapshot.val();
 
-
         // STEP 4: REDIRECT USER
-
         if (role === "admin") {
-
             window.location.href = "admin/dashboard.php";
-
         }
-
         else if (role === "user") {
-
             window.location.href = "user/dashboard.php";
-
         }
-
         else {
-
-            throw new Error(
-                "Invalid account role. Please contact the administrator."
-            );
-
+            throw new Error("Invalid account role. Please contact the administrator.");
         }
 
     }
@@ -461,53 +292,29 @@ loginForm.addEventListener("submit", async function (event) {
 
         console.error("AgriTrack Login Error:", error);
 
-        // ERROR MESSAGES
-
         const errorMessages = {
-
-            "auth/invalid-credential":
-                "Incorrect email or password.",
-
-            "auth/invalid-email":
-                "Please enter a valid email address.",
-
-            "auth/too-many-requests":
-                "Too many login attempts. Please try again later.",
-
-            "auth/network-request-failed":
-                "Network error. Please check your internet connection.",
-
-            "auth/user-disabled":
-                "Your account has been disabled."
-
+            "auth/invalid-credential": "Incorrect email or password.",
+            "auth/invalid-email": "Please enter a valid email address.",
+            "auth/too-many-requests": "Too many login attempts. Please try again later.",
+            "auth/network-request-failed": "Network error. Please check your internet connection.",
+            "auth/user-disabled": "Your account has been disabled."
         };
-
 
         const message =
             errorMessages[error.code] ||
             error.message ||
             "Unable to sign in. Please try again.";
 
-
         showMessage(message, "danger");
 
-
         // SIGN OUT IF ROLE CHECK FAILS
-
         if (auth.currentUser) {
-
             try {
-
                 await signOut(auth);
-
             }
-
             catch (signOutError) {
-
                 console.error("Sign out error:", signOutError);
-
             }
-
         }
 
     }
@@ -515,71 +322,38 @@ loginForm.addEventListener("submit", async function (event) {
     finally {
 
         loginButton.disabled = false;
-
-        buttonText.textContent = "Sign In";
+        buttonText.textContent = "Sign in";
 
     }
 
 });
 
 
-// =========================
 // FORGOT PASSWORD
-// =========================
-
 forgotPassword.addEventListener("click", async function (event) {
 
     event.preventDefault();
 
     const email = emailInput.value.trim();
 
-
     if (!email) {
-
-        showMessage(
-            "Please enter your email address first.",
-            "warning"
-        );
-
+        showMessage("Please enter your email address first.", "warning");
         emailInput.focus();
-
         return;
-
     }
-
 
     try {
-
         await sendPasswordResetEmail(auth, email);
-
-        showMessage(
-            "Password reset instructions have been sent to your email.",
-            "success"
-        );
-
+        showMessage("Password reset instructions have been sent to your email.", "success");
     }
-
     catch (error) {
-
         console.error("Password Reset Error:", error);
-
-        showMessage(
-            "Unable to send password reset email. Please check your email and try again.",
-            "danger"
-        );
-
+        showMessage("Unable to send password reset email. Please check your email and try again.", "danger");
     }
 
 });
 
-
-// =========================
-// FIREBASE INITIALIZATION
-// =========================
-
 console.log("AgriTrack Login Page Loaded.");
-
-console.log("Firebase Authentication Initialized.");
 
 </script>
 

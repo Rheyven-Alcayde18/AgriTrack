@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create your AgriTrack farmer account.">
+    <meta name="theme-color" content="#0d4529">
+
     <title>Register | AgriTrack</title>
 
-    <!-- Google Fonts -->
+    <!-- Favicon (inline, so the browser never asks for a missing favicon.ico) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%231a8348'/%3E%3Ctext x='50' y='68' font-size='56' text-anchor='middle'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+
+    <!-- Faster loading of fonts and icons (fonts are loaded from assets/css/style.css) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Phosphor Icons (duotone for decoration, bold for actions) -->
+    <link href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css" rel="stylesheet">
 
     <!-- Shared stylesheet (same look as the login page) -->
     <link rel="stylesheet" href="assets/css/style.css">
@@ -26,23 +31,14 @@
 
 <div class="login-wrapper">
 
-    <!-- LEFT BRAND SECTION -->
-    <div class="brand-section">
-
-        <div class="brand-logo">
-            <i class="bi bi-flower1"></i>
-            <span>AgriTrack</span>
-        </div>
+    <!-- LEFT BRAND SECTION (decorative photo + tagline) -->
+    <aside class="brand-section">
 
         <div class="brand-content">
 
-            <span class="welcome-label">
-                SMART FARM MANAGEMENT
-            </span>
-
             <h1>
                 Start growing<br>
-                <em>smarter.</em>
+                <span>smarter.</span>
             </h1>
 
             <p>
@@ -52,59 +48,34 @@
             </p>
 
             <div class="feature-list">
-
-                <div>
-                    <i class="bi bi-cloud-sun"></i>
-                    Weather Forecast
-                </div>
-
-                <div>
-                    <i class="bi bi-flower2"></i>
-                    Crop Monitoring
-                </div>
-
-                <div>
-                    <i class="bi bi-graph-up-arrow"></i>
-                    Harvest Management
-                </div>
-
-                <div>
-                    <i class="bi bi-people"></i>
-                    Farmer-Friendly Platform
-                </div>
-
+                <div><i class="ph-duotone ph-cloud-sun" aria-hidden="true"></i> Weather forecast</div>
+                <div><i class="ph-duotone ph-plant" aria-hidden="true"></i> Crop monitoring</div>
+                <div><i class="ph-duotone ph-grains" aria-hidden="true"></i> Harvest management</div>
+                <div><i class="ph-duotone ph-hand-heart" aria-hidden="true"></i> Farmer-friendly platform</div>
             </div>
 
         </div>
 
-        <div class="brand-footer">
+        <footer class="brand-footer">
             © 2026 AgriTrack. All rights reserved.
-        </div>
+        </footer>
 
-    </div>
+    </aside>
 
     <!-- RIGHT REGISTRATION SECTION -->
-    <div class="form-section">
+    <main class="form-section">
 
         <div class="login-card">
 
             <div class="mobile-logo">
-                <i class="bi bi-flower1"></i>
+                <i class="ph-duotone ph-leaf" aria-hidden="true"></i>
                 AgriTrack
             </div>
 
             <div class="form-heading">
-
-                <span class="small-label">
-                    CREATE YOUR ACCOUNT
-                </span>
-
+                <span class="small-label">Create your account</span>
                 <h2>Join AgriTrack</h2>
-
-                <p>
-                    Enter your details to create your farmer account.
-                </p>
-
+                <p>Enter your details to create your farmer account.</p>
             </div>
 
             <!-- ERROR / SUCCESS MESSAGE -->
@@ -114,17 +85,16 @@
 
                 <!-- FULL NAME -->
                 <div class="mb-3">
-                    <label for="fullName" class="form-label">
-                        Full Name
-                    </label>
+                    <label for="fullName" class="form-label">Full name</label>
 
                     <div class="input-container">
-                        <i class="bi bi-person"></i>
+                        <i class="ph-duotone ph-user" aria-hidden="true"></i>
 
                         <input
                             type="text"
                             class="form-control"
                             id="fullName"
+                            name="fullName"
                             placeholder="Enter your full name"
                             required
                             minlength="2"
@@ -135,47 +105,51 @@
 
                 <!-- EMAIL -->
                 <div class="mb-3">
-                    <label for="email" class="form-label">
-                        Email Address
-                    </label>
+                    <label for="email" class="form-label">Email address</label>
 
                     <div class="input-container">
-                        <i class="bi bi-envelope"></i>
+                        <i class="ph-duotone ph-envelope-simple" aria-hidden="true"></i>
 
                         <input
                             type="email"
                             class="form-control"
                             id="email"
+                            name="email"
                             placeholder="Enter your email"
                             required
-                            autocomplete="email">
+                            autocomplete="email"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            inputmode="email">
                     </div>
                 </div>
 
                 <!-- PASSWORD -->
                 <div class="mb-3">
-                    <label for="password" class="form-label">
-                        Password
-                    </label>
+                    <label for="password" class="form-label">Password</label>
 
                     <div class="input-container">
-                        <i class="bi bi-lock"></i>
+                        <i class="ph-duotone ph-lock-key" aria-hidden="true"></i>
 
                         <input
                             type="password"
                             class="form-control"
                             id="password"
+                            name="password"
                             placeholder="Create a password"
                             required
                             minlength="6"
-                            autocomplete="new-password">
+                            autocomplete="new-password"
+                            aria-describedby="strengthText">
 
                         <button
                             class="password-toggle"
                             type="button"
                             id="togglePassword"
-                            aria-label="Show password">
-                            <i class="bi bi-eye"></i>
+                            aria-label="Show password"
+                            aria-controls="password"
+                            aria-pressed="false">
+                            <i class="ph-bold ph-eye" aria-hidden="true"></i>
                         </button>
                     </div>
 
@@ -183,24 +157,23 @@
                         <span></span><span></span><span></span><span></span>
                     </div>
 
-                    <small class="field-hint" id="strengthText">
+                    <small class="field-hint" id="strengthText" aria-live="polite">
                         Use at least 6 characters.
                     </small>
                 </div>
 
                 <!-- CONFIRM PASSWORD -->
                 <div class="mb-4">
-                    <label for="confirmPassword" class="form-label">
-                        Confirm Password
-                    </label>
+                    <label for="confirmPassword" class="form-label">Confirm password</label>
 
                     <div class="input-container">
-                        <i class="bi bi-shield-lock"></i>
+                        <i class="ph-duotone ph-shield-check" aria-hidden="true"></i>
 
                         <input
                             type="password"
                             class="form-control"
                             id="confirmPassword"
+                            name="confirmPassword"
                             placeholder="Confirm your password"
                             required
                             minlength="6"
@@ -209,18 +182,17 @@
                 </div>
 
                 <!-- SUBMIT -->
-                <button
-                    type="submit"
-                    class="register-btn"
-                    id="registerButton">
+                <button type="submit" class="register-btn" id="registerButton">
 
-                    <span id="buttonText">Create Account</span>
+                    <span id="buttonText">Create account</span>
 
                     <span
                         id="loadingSpinner"
                         class="spinner-border spinner-border-sm d-none"
                         aria-hidden="true">
                     </span>
+
+                    <i class="ph-bold ph-arrow-right" id="buttonIcon" aria-hidden="true"></i>
 
                 </button>
 
@@ -229,15 +201,13 @@
             <div class="register-section">
                 <p>
                     Already have an account?
-                    <a href="index.html" class="register-link">
-                        Sign In
-                    </a>
+                    <a href="index.html" class="register-link">Sign in</a>
                 </p>
             </div>
 
         </div>
 
-    </div>
+    </main>
 
 </div>
 
@@ -268,6 +238,7 @@
     const messageBox = document.getElementById("messageBox");
     const registerButton = document.getElementById("registerButton");
     const buttonText = document.getElementById("buttonText");
+    const buttonIcon = document.getElementById("buttonIcon");
     const loadingSpinner = document.getElementById("loadingSpinner");
 
     const togglePassword = document.getElementById("togglePassword");
@@ -282,6 +253,27 @@
         messageBox.className = "alert alert-" + type;
     }
 
+    // LOADING STATE (spinner replaces the arrow while working)
+    function setLoading(isLoading) {
+        registerButton.disabled = isLoading;
+        buttonText.textContent = isLoading ? "Creating account..." : "Create account";
+        loadingSpinner.classList.toggle("d-none", !isLoading);
+        buttonIcon.classList.toggle("d-none", isLoading);
+    }
+
+    // MARK A FIELD AS INVALID AND MOVE FOCUS TO IT
+    function flagField(input) {
+        input.setAttribute("aria-invalid", "true");
+        input.focus();
+    }
+
+    // CLEAR THE INVALID MARK AS SOON AS THE PERSON EDITS THE FIELD
+    [fullNameInput, emailInput, passwordInput, confirmPasswordInput].forEach(function (input) {
+        input.addEventListener("input", function () {
+            input.removeAttribute("aria-invalid");
+        });
+    });
+
 
     // PASSWORD VISIBILITY
     togglePassword.addEventListener("click", function () {
@@ -291,13 +283,11 @@
         passwordInput.type = isPassword ? "text" : "password";
 
         togglePassword.innerHTML = isPassword
-            ? '<i class="bi bi-eye-slash"></i>'
-            : '<i class="bi bi-eye"></i>';
+            ? '<i class="ph-bold ph-eye-slash" aria-hidden="true"></i>'
+            : '<i class="ph-bold ph-eye" aria-hidden="true"></i>';
 
-        togglePassword.setAttribute(
-            "aria-label",
-            isPassword ? "Hide password" : "Show password"
-        );
+        togglePassword.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+        togglePassword.setAttribute("aria-pressed", isPassword ? "true" : "false");
 
     });
 
@@ -334,47 +324,44 @@
 
         event.preventDefault();
 
+        // clear any message left over from a previous attempt
+        messageBox.className = "alert d-none";
+
         const fullName = fullNameInput.value.trim();
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
 
-        // VALIDATE PASSWORD
-        if (password !== confirmPassword) {
-            showMessage("Passwords do not match.", "danger");
+        // VALIDATE
+        if (!fullName) {
+            showMessage("Please enter your full name.", "danger");
+            flagField(fullNameInput);
             return;
         }
 
         if (password.length < 6) {
             showMessage("Password must contain at least 6 characters.", "danger");
+            flagField(passwordInput);
             return;
         }
 
-        if (!fullName) {
-            showMessage("Please enter your full name.", "danger");
+        if (password !== confirmPassword) {
+            showMessage("Passwords do not match.", "danger");
+            flagField(confirmPasswordInput);
             return;
         }
 
         // LOADING STATE
-        registerButton.disabled = true;
-        buttonText.textContent = "Creating Account...";
-        loadingSpinner.classList.remove("d-none");
+        setLoading(true);
 
         try {
 
             // CREATE FIREBASE AUTHENTICATION ACCOUNT
-            const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
             // SET DISPLAY NAME
-            await updateProfile(user, {
-                displayName: fullName
-            });
+            await updateProfile(user, { displayName: fullName });
 
             // SAVE USER PROFILE TO REALTIME DATABASE
             await set(ref(database, "users/" + user.uid), {
@@ -384,19 +371,16 @@
                 createdAt: serverTimestamp()
             });
 
-            showMessage(
-                "Registration successful! Redirecting to login...",
-                "success"
-            );
+            showMessage("Registration successful! Redirecting to login...", "success");
 
             registerForm.reset();
             strengthMeter.dataset.level = 0;
             strengthText.textContent = "Use at least 6 characters.";
 
-            // SIGN OUT SO USER CAN SIGN IN NORMALLY
-            // The account and profile remain saved.
+            // SIGN OUT SO USER CAN SIGN IN NORMALLY (the account and profile remain saved)
             await auth.signOut();
 
+            // the button stays disabled while the page redirects
             setTimeout(function () {
                 window.location.href = "index.html";
             }, 1800);
@@ -406,19 +390,23 @@
             console.error("Registration Error:", error);
 
             let errorMessage = "Registration failed. Please try again.";
+            let fieldToFlag = null;
 
             switch (error.code) {
 
                 case "auth/email-already-in-use":
                     errorMessage = "This email address is already registered.";
+                    fieldToFlag = emailInput;
                     break;
 
                 case "auth/invalid-email":
                     errorMessage = "Please enter a valid email address.";
+                    fieldToFlag = emailInput;
                     break;
 
                 case "auth/weak-password":
                     errorMessage = "Your password is too weak.";
+                    fieldToFlag = passwordInput;
                     break;
 
                 case "auth/network-request-failed":
@@ -434,9 +422,9 @@
 
             showMessage(errorMessage, "danger");
 
-            registerButton.disabled = false;
-            buttonText.textContent = "Create Account";
-            loadingSpinner.classList.add("d-none");
+            setLoading(false);
+
+            if (fieldToFlag) flagField(fieldToFlag);
 
         }
 
