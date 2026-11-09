@@ -1,104 +1,115 @@
 // assets/js/admin-dashboard.js
-// Admin dashboard: chart tooltips, "Table" view toggles and live weather alerts.
-// Loaded by admin/dashboard.php, which first sets window.AGRITRACK_ADMIN = { towns: [{name, lat, lon, farmers}] }.
-(function () {
-  var DATA = window.AGRITRACK_ADMIN || { towns: [] };
-  var $ = function (id) { return document.getElementById(id); };
-  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+// Admin dashboard, connected to Firebase Realtime Database.
+// Reads every farmer, crop, harvest and activity record (admins only, see database.rules.json).
+// Loaded by admin/dashboard.php.
+import { requireUser, listAllUsers, listAll, derive, esc, num, peso, todayISO, fmtMD, showError } from "./db.js";
 
-  /* ---------- Tooltips (mouse and keyboard focus) ---------- */
-  var tip = $('tip');
-  function showTip(el, x, y) {
-    var text = el.getAttribute('data-tip');
-    if (!text) return;
-    var lines = text.split('\n');
-    tip.innerHTML = '<b>' + esc(lines[0]) + '</b>' + esc(lines.slice(1).join('\n'));
-    tip.style.display = 'block';
-    var w = tip.offsetWidth, h = tip.offsetHeight;
-    var left = Math.min(Math.max(8, x - w / 2), window.innerWidth - w - 8);
-    var top = y - h - 14;
-    if (top < 8) top = y + 18;
-    tip.style.left = left + 'px'; tip.style.top = top + 'px';
-  }
-  function hideTip() { tip.style.display = 'none'; }
-  document.addEventListener('mousemove', function (e) {
-    var el = e.target.closest ? e.target.closest('[data-tip]') : null;
-    if (el) showTip(el, e.clientX, e.clientY); else hideTip();
-  });
-  document.addEventListener('focusin', function (e) {
-    var el = e.target.closest ? e.target.closest('[data-tip]') : null;
-    if (!el) return;
-    var r = el.getBoundingClientRect();
-    showTip(el, r.left + r.width / 2, r.top);
-  });
-  document.addEventListener('focusout', hideTip);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideTip(); });
+const $ = (id) => document.getElementById(id);
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  /* ---------- Chart <-> table toggles ---------- */
-  document.querySelectorAll('[data-toggle]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var id = btn.getAttribute('data-toggle');
-      var table = $(id), viz = $(id + '-viz');
-      var on = btn.getAttribute('aria-pressed') !== 'true';
-      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      btn.textContent = on ? 'Chart' : 'Table';
-      table.classList.toggle('show', on);
-      viz.classList.toggle('hide', on);
-      hideTip();
-    });
-  });
+const none = (text) => '<p class="ad-none">' + esc(text) + "</p>";
+const bars = (items, cls) => {
+  const max = Math.max(...items.map((i) => i.value), 1);
+  return items.map((i) =>
+    '<div><div class="ad-bar-top"><b>' + esc(i.label) + "</b><span>" + esc(i.note) + '</span></div><div class="ad-track ' + (cls || "") + '"><i style="width:' + Math.round((i.value / max) * 100) + '%"></i></div></div>').join("");
+};
 
-  /* ---------- Weather alerts ---------- */
-  var DAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  function dayName(iso, i) {
-    return i === 0 ? 'today' : DAY[new Date(iso + 'T00:00:00').getDay()];
-  }
-  function townAlerts(t, d) {
-    var out = [];
-    for (var i = 0; i < d.time.length; i++) {
-      var day = dayName(d.time[i], i), rain = d.precipitation_probability_max[i] || 0, wind = d.wind_speed_10m_max[i] || 0;
-      if (d.weather_code[i] >= 95) out.push({ level: 'alert', title: 'Thunderstorms', day: day, text: 'Thunderstorms forecast. Open fields are unsafe during lightning.' });
-      else if (rain >= 70) out.push({ level: 'warn', title: 'Heavy rain likely', day: day, text: rain + '% chance of rain. Spraying and fertilizing should wait.' });
-      if (wind >= 30) out.push({ level: 'warn', title: 'Strong winds', day: day, text: 'Gusts around ' + Math.round(wind) + ' km/h can damage tall crops and covers.' });
-      if (d.temperature_2m_max[i] >= 35) out.push({ level: 'warn', title: 'Extreme heat', day: day, text: 'High of ' + Math.round(d.temperature_2m_max[i]) + '°C. Plants and workers need extra water and shade.' });
-    }
-    return out;
-  }
+requireUser({ role: "admin" }).then(async () => {
+  try {
+    const [users, cropsByUid, harvestsByUid, actsByUid] = await Promise.all([
+      listAllUsers(), listAll("crops"), listAll("harvests"), listAll("activities"),
+    ]);
 
-  function renderAlerts(results) {
-    var items = [];
-    results.forEach(function (r) {
-      townAlerts(r.town, r.daily).forEach(function (a) { a.town = r.town; items.push(a); });
-    });
-    var box = $('alerts');
-    if (!items.length) {
-      box.innerHTML = '<p class="ad-wx-msg">No weather alerts for the next 3 days across ' + DATA.towns.length + ' municipalit' + (DATA.towns.length === 1 ? 'y' : 'ies') + '.</p>';
-      return;
-    }
-    var rank = { alert: 0, warn: 1 };
-    items.sort(function (a, b) { return rank[a.level] - rank[b.level]; });
-    box.innerHTML = items.slice(0, 6).map(function (a) {
-      return '<div class="ad-alert ' + a.level + '"><span class="ic">' + (a.level === 'alert' ? '!' : '▲') + '</span>' +
-        '<div><b>' + esc(a.title) + ' in ' + esc(a.town.name) + ' (' + esc(a.day) + ')</b><span>' + esc(a.text) + '</span>' +
-        '<small>' + a.town.farmers + ' active farmer' + (a.town.farmers === 1 ? '' : 's') + ' affected</small></div></div>';
-    }).join('') + (items.length > 6 ? '<p class="ad-wx-msg">+ ' + (items.length - 6) + ' more alerts</p>' : '');
-  }
+    const farmers = users.filter((u) => u.role !== "admin");
+    const nameOf = {};
+    farmers.forEach((f) => { nameOf[f.id] = f.name || f.email || "Farmer"; });
 
-  function loadAlerts() {
-    var towns = DATA.towns, box = $('alerts');
-    if (!towns.length) { box.innerHTML = '<p class="ad-wx-msg">No active farmers with a known location.</p>'; return; }
-    var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + towns.map(function (t) { return t.lat; }).join(',') +
-      '&longitude=' + towns.map(function (t) { return t.lon; }).join(',') +
-      '&daily=weather_code,temperature_2m_max,precipitation_probability_max,wind_speed_10m_max&timezone=auto&forecast_days=3';
-    fetch(url)
-      .then(function (r) { if (!r.ok) throw new Error('bad response'); return r.json(); })
-      .then(function (data) {
-        var arr = Array.isArray(data) ? data : [data];
-        renderAlerts(arr.map(function (d, i) { return { town: towns[i], daily: d.daily }; }));
-      })
-      .catch(function () {
-        box.innerHTML = '<p class="ad-wx-msg">Weather alerts could not be loaded. Check your connection and reload the page.</p>';
+    // Crops (only for farmers that exist)
+    const crops = [];
+    Object.keys(cropsByUid).forEach((uid) => {
+      if (!nameOf[uid]) return;
+      Object.entries(cropsByUid[uid] || {}).forEach(([id, v]) => {
+        try { crops.push({ ...derive({ ...v, id }), uid, farmer: nameOf[uid] }); } catch (e) { /* skip a malformed record */ }
       });
+    });
+    const live = crops.filter((c) => c.status !== "done");
+
+    // Harvests
+    const harvests = [];
+    Object.keys(harvestsByUid).forEach((uid) => {
+      if (!nameOf[uid]) return;
+      Object.values(harvestsByUid[uid] || {}).forEach((h) => { if (h && h.date) harvests.push(h); });
+    });
+
+    $("sampleNote").style.display = farmers.some((f) => f.sample) ? "block" : "none";
+    $("empty").style.display = farmers.length ? "none" : "block";
+
+    // ---- stats
+    const active = farmers.filter((f) => f.status !== "inactive").length;
+    const area = live.reduce((s, c) => s + c.area, 0);
+    const tons = harvests.reduce((s, h) => s + (Number(h.yield_t) || 0), 0);
+    const revenue = harvests.reduce((s, h) => s + (Number(h.yield_t) || 0) * 1000 * (Number(h.price) || 0), 0);
+    const warn = live.filter((c) => c.status === "warn").length;
+    const tiles = [
+      ["Farmers", farmers.length, active + " active, " + (farmers.length - active) + " inactive", ""],
+      ["Crops growing", live.length, num(area) + " ha planted", ""],
+      ["Total harvested", num(tons) + " t", peso(revenue) + " estimated sales", ""],
+      ["Need attention", warn, warn ? "Crops with dry soil" : "Everything looks fine", warn ? "warn" : ""],
+    ];
+    $("stats").innerHTML = tiles.map((t) =>
+      '<div class="ad-stat ' + t[3] + '"><small>' + esc(t[0]) + "</small><b>" + esc(t[1]) + "</b><span>" + esc(t[2]) + "</span></div>").join("");
+
+    // ---- harvested per month (last 6 months)
+    const [ty, tm] = todayISO().split("-").map(Number);
+    const months = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(Date.UTC(ty, tm - 1 - i, 1));
+      months.push({ key: d.getUTCFullYear() + "-" + String(d.getUTCMonth() + 1).padStart(2, "0"), label: MONTHS[d.getUTCMonth()], t: 0 });
+    }
+    harvests.forEach((h) => { const m = months.find((x) => x.key === h.date.slice(0, 7)); if (m) m.t += Number(h.yield_t) || 0; });
+    const top = Math.max(...months.map((m) => m.t), 1);
+    $("chart").innerHTML = months.map((m) =>
+      '<div class="ad-col' + (m.t ? "" : " zero") + '"><b>' + (m.t ? num(m.t) : "0") + '</b><i style="height:' + Math.max(3, Math.round((m.t / top) * 130)) + 'px"></i><small>' + m.label + "</small></div>").join("");
+
+    // ---- recently joined
+    const joined = farmers.slice().sort((a, b) => ((a.joined || "") < (b.joined || "") ? 1 : -1)).slice(0, 5);
+    $("joined").innerHTML = joined.length ? joined.map((f) =>
+      '<div class="ad-row"><div><b>' + esc(f.name || f.email) + "</b><small>" + esc(f.municipality || "No municipality") + (f.joined ? " &middot; joined " + esc(fmtMD(f.joined)) : "") +
+      '</small></div><span class="ad-pill ' + (f.status === "inactive" ? "inactive" : "active") + '">' + (f.status === "inactive" ? "Inactive" : "Active") + "</span></div>").join("") : none("No farmers yet.");
+
+    // ---- farmers by municipality
+    const towns = {};
+    farmers.forEach((f) => { const t = f.municipality || "Not set"; towns[t] = (towns[t] || 0) + 1; });
+    const townList = Object.entries(towns).sort((a, b) => b[1] - a[1]).slice(0, 6)
+      .map(([label, value]) => ({ label, value, note: value + " farmer" + (value === 1 ? "" : "s") }));
+    $("towns").innerHTML = townList.length ? bars(townList) : none("No farmers yet.");
+
+    // ---- crop mix
+    const mix = {};
+    live.forEach((c) => { const k = c.name || "Other"; mix[k] = mix[k] || { area: 0, n: 0 }; mix[k].area += c.area; mix[k].n += 1; });
+    const mixList = Object.entries(mix).sort((a, b) => b[1].area - a[1].area).slice(0, 6)
+      .map(([label, v]) => ({ label, value: v.area, note: num(v.area) + " ha, " + v.n + " crop" + (v.n === 1 ? "" : "s") }));
+    $("mix").innerHTML = mixList.length ? bars(mixList, "blue") : none("No crops added yet.");
+
+    // ---- needs attention
+    const attn = live.filter((c) => c.status === "warn" || c.status === "soon")
+      .sort((a, b) => (a.status === b.status ? a.days - b.days : a.status === "warn" ? -1 : 1)).slice(0, 6);
+    $("attention").innerHTML = attn.length ? attn.map((c) =>
+      '<div class="ad-row"><div><b>' + esc(c.name) + " &middot; " + esc(c.field) + "</b><small>" + esc(c.farmer) + " &middot; " +
+      (c.status === "warn" ? "soil moisture " + c.moisture + "%" : "harvest " + esc(fmtMD(c.harvest))) +
+      '</small></div><span class="ad-pill ' + c.status + '">' + esc(c.label) + "</span></div>").join("") : none("Nothing needs attention.");
+
+    // ---- recent activity
+    const acts = [];
+    Object.keys(actsByUid).forEach((uid) => {
+      if (!nameOf[uid]) return;
+      Object.values(actsByUid[uid] || {}).forEach((a) => { if (a && a.text) acts.push({ ...a, farmer: nameOf[uid] }); });
+    });
+    acts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    $("activity").innerHTML = acts.length ? acts.slice(0, 7).map((a) =>
+      '<div class="ad-row"><div><b>' + esc(a.farmer) + "</b><small>" + esc(a.text) + "</small></div><span>" + esc(a.date ? fmtMD(a.date) : "") + "</span></div>").join("") : none("No activity yet.");
+  } catch (err) {
+    console.error(err);
+    showError("Could not load the admin data. " + (err && err.code === "PERMISSION_DENIED" ? "Publish database.rules.json in Firebase, and make sure your account's role is admin." : "Check your connection and reload."));
   }
-  loadAlerts();
-})();
+});
