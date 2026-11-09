@@ -21,41 +21,6 @@ $nav = [
 ];
 $current = 'harvest-management.php';
 
-// Same crop records as Crop monitoring
-require __DIR__ . '/crops-data.php';
-
-$peso = "\u{20B1}";
-$today = new DateTime('today');
-$totalYield = 0; $totalRevenue = 0; $soonCount = 0;
-
-foreach ($crops as &$c) {
-  $c['days'] = (int)$today->diff(new DateTime($c['harvest']))->format('%r%a');
-  $c['revenue'] = $c['yield_t'] * 1000 * $c['price'];
-  if ($c['days'] <= 0)       { $c['hs'] = 'soon';     $c['hl'] = 'Ready now'; }
-  elseif ($c['days'] <= 14)  { $c['hs'] = 'soon';     $c['hl'] = 'Harvest soon'; }
-  elseif ($c['days'] <= 45)  { $c['hs'] = 'upcoming'; $c['hl'] = 'Upcoming'; }
-  else                       { $c['hs'] = 'growing';  $c['hl'] = 'Growing'; }
-  if ($c['days'] <= 14) $soonCount++;
-  $totalYield += $c['yield_t'];
-  $totalRevenue += $c['revenue'];
-}
-unset($c);
-usort($crops, function ($a, $b) { return strcmp($a['harvest'], $b['harvest']); });
-
-$next = $crops[0];
-$maxDays = max(1, max(array_column($crops, 'days')) + 6);
-$pastYield = 0; $pastRevenue = 0;
-foreach ($pastHarvests as $p) { $pastYield += $p['yield_t']; $pastRevenue += $p['yield_t'] * 1000 * $p['price']; }
-
-function daysText($d) { return $d > 0 ? 'In ' . $d . ' day' . ($d === 1 ? '' : 's') : ($d === 0 ? 'Today' : 'Ready now'); }
-function num($n) { return rtrim(rtrim(number_format($n, 1), '0'), '.'); }
-
-$stats = [
-  ['Next harvest', $next['name'], date('M j', strtotime($next['harvest'])) . ' · ' . daysText($next['days'])],
-  ['Expected yield', num($totalYield) . ' t', 'Across ' . count($crops) . ' crops'],
-  ['Estimated revenue', $peso . number_format($totalRevenue), 'At current expected prices'],
-  ['Ready within 2 weeks', (string)$soonCount, $soonCount ? 'Start preparing now' : 'Nothing urgent'],
-];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -67,6 +32,7 @@ $stats = [
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/agri-ui.css">
   <style>
     /* Harvest page only. Every class is prefixed hm- so nothing clashes with dashboard.css */
     .hm {
@@ -193,27 +159,12 @@ $stats = [
       <p class="hm-welcome" id="welcome"></p>
     </header>
 
-    <section class="hm-stats">
-      <?php foreach ($stats as [$label, $value, $note]): ?>
-        <div class="hm-stat">
-          <small><?= h($label) ?></small>
-          <b><?= h($value) ?></b>
-          <span><?= h($note) ?></span>
-        </div>
-      <?php endforeach; ?>
-    </section>
+    <section class="hm-stats" id="stats" aria-live="polite"></section>
 
     <section class="hm-card hm-tlcard">
       <h2>Harvest timeline</h2>
       <p>Expected harvest dates for the coming months.</p>
-      <div class="hm-track">
-        <a class="hm-mark today" style="left:0%" href="#"><i></i><span><b>Today</b><small><?= h(date('M j')) ?></small></span></a>
-        <?php foreach ($crops as $mi => $c): ?>
-          <a class="hm-mark <?= h($c['hs']) ?><?= $mi % 2 === 0 ? ' up' : '' ?>" style="left:<?= round(max(0, $c['days']) / $maxDays * 100, 1) ?>%" href="#crop-<?= h($c['id']) ?>">
-            <i></i><span><b><?= h($c['name']) ?></b><small><?= h(date('M j', strtotime($c['harvest']))) ?></small></span>
-          </a>
-        <?php endforeach; ?>
-      </div>
+      <div class="hm-track" id="track"></div>
       <div class="hm-legend">
         <em class="soon">Within 2 weeks</em>
         <em>Within 45 days</em>
@@ -224,42 +175,13 @@ $stats = [
     <div class="hm-cols">
       <section class="hm-card hm-sched">
         <h2>Harvest schedule</h2>
-        <?php foreach ($crops as $c): ?>
-          <div class="hm-row" id="crop-<?= h($c['id']) ?>">
-            <div class="hm-date">
-              <small><?= h(date('M', strtotime($c['harvest']))) ?></small>
-              <b><?= h(date('j', strtotime($c['harvest']))) ?></b>
-            </div>
-            <div class="hm-info">
-              <b><?= h($c['name']) ?></b>
-              <small><?= h($c['field']) ?> &middot; <?= h(num($c['area'])) ?> ha &middot; <?= h(num($c['yield_t'])) ?> t expected</small>
-              <div class="hm-ready" title="Growth progress from Crop monitoring">
-                <div class="tr"><i style="width:<?= (int)$c['progress'] ?>%"></i></div>
-                <span><?= h($c['stage']) ?> &middot; <?= (int)$c['progress'] ?>%</span>
-              </div>
-            </div>
-            <div class="hm-side">
-              <span class="hm-pill <?= h($c['hs']) ?>"><?= h($c['hl']) ?></span>
-              <b><?= h($peso . number_format($c['revenue'])) ?></b>
-              <small><?= h(daysText($c['days'])) ?></small>
-              <a class="hm-link" href="crop-monitoring.php#crop-<?= h($c['id']) ?>">View in crop monitoring &rarr;</a>
-              <a class="hm-link" href="market-locations.php?crop=<?= h($c['id']) ?>">Find best market &rarr;</a>
-            </div>
-          </div>
-        <?php endforeach; ?>
+        <div id="sched"><div class="ag-loading">Loading&hellip;</div></div>
       </section>
 
       <aside class="hm-card hm-prep">
         <h2>Preparation checklist</h2>
-        <p>Tasks for your next harvests. Ticks are saved on this device.</p>
-        <?php foreach (array_slice($crops, 0, 3) as $c): ?>
-          <div class="hm-group">
-            <h3><?= h($c['name']) ?> <small><?= h(date('M j', strtotime($c['harvest']))) ?></small></h3>
-            <?php foreach ($c['prep'] as $i => $task): ?>
-              <label><input type="checkbox" data-key="hm-<?= h($c['id']) ?>-<?= (int)$i ?>"><span><?= h($task) ?></span></label>
-            <?php endforeach; ?>
-          </div>
-        <?php endforeach; ?>
+        <p>Tasks for your next harvests. Ticks are saved to your account.</p>
+        <div id="prep"></div>
       </aside>
     </div>
 
@@ -269,29 +191,16 @@ $stats = [
         <thead>
           <tr><th>Date</th><th>Crop</th><th>Field</th><th class="r">Yield</th><th class="r">Sold at</th><th class="r">Revenue</th></tr>
         </thead>
-        <tbody>
-          <?php foreach ($pastHarvests as $p): ?>
-            <tr>
-              <td><?= h(date('M j, Y', strtotime($p['date']))) ?></td>
-              <td><b><?= h($p['crop']) ?></b></td>
-              <td><?= h($p['field']) ?></td>
-              <td class="r"><?= h(num($p['yield_t'])) ?> t</td>
-              <td class="r"><?= h($peso . $p['price']) ?>/kg</td>
-              <td class="r"><?= h($peso . number_format($p['yield_t'] * 1000 * $p['price'])) ?></td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-        <tfoot>
-          <tr><td colspan="3">Total this season</td><td class="r"><?= h(num($pastYield)) ?> t</td><td></td><td class="r"><?= h($peso . number_format($pastRevenue)) ?></td></tr>
-        </tfoot>
+        <tbody id="past"></tbody>
+        <tfoot id="pastFoot"></tfoot>
       </table>
     </section>
 
-    <p class="hm-note">Crop records come from Crop monitoring. Figures shown are sample data until your farm records are connected.</p>
+    <p class="hm-note">Crop records come from Crop monitoring and are saved in Firebase. Record a harvest from the crop card.</p>
   </main>
 </div>
 
 <script type="module" src="../assets/js/auth.js"></script>
-<script src="../assets/js/harvest.js"></script>
+<script type="module" src="../assets/js/harvest.js"></script>
 </body>
 </html>

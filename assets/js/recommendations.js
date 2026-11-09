@@ -1,10 +1,39 @@
 // assets/js/recommendations.js
-// Recommendations: builds the action list from crops, the Open-Meteo forecast and the markets.
-// Loaded by user/recommendations.php, which first sets window.AGRITRACK_DATA (crops + markets) from PHP.
-(function () {
-  var DATA = window.AGRITRACK_DATA || { crops: [], markets: [] };
+// Recommendations: reads the signed-in farmer's crops, the market listings and today's ticked items
+// from Firebase (through db.js), then builds the action list from them and the Open-Meteo forecast.
+// Loaded by user/recommendations.php as a module. No other loader file is needed.
+import { requireUser, listCrops, loadMarkets, getChecklist, setCheck, showError, toast } from "./db.js";
+
+requireUser().then(async ({ uid }) => {
+  try {
+    var all = await Promise.all([listCrops(uid), loadMarkets(), getChecklist(uid)]);
+
+    // Only crops still in the field get recommendations. No crops added means no crop recommendations.
+    var crops = all[0]
+      .filter(function (c) { return c.status !== 'done'; })
+      .sort(function (a, b) { return a.harvest < b.harvest ? -1 : 1; })
+      .map(function (c) {
+        return {
+          id: c.id, key: String(c.name || '').trim().toLowerCase(), name: c.name, field: c.field, area: c.area,
+          stage: c.stage, progress: c.progress, moisture: c.moisture, harvest: c.harvest, days: c.days,
+          yield_t: c.yield_t, price: c.price, prep: c.prep
+        };
+      });
+
+    run(
+      { crops: crops, markets: all[1], done: Object.keys(all[2] || {}) },
+      function (key, on) {
+        setCheck(uid, key, !!on).catch(function (err) { console.error(err); toast('Could not save that tick'); });
+      }
+    );
+  } catch (err) {
+    console.error(err);
+    showError('Could not load recommendations. ' + (err && err.code === 'PERMISSION_DENIED' ? 'Publish database.rules.json in Firebase first.' : 'Check your connection and reload.'));
+  }
+});
+
+function run(DATA, onDone) {
   var DEFAULT_FARM = { name: 'Bay, Laguna, Philippines', lat: 14.1833, lon: 121.2833 };
-  var DONE_KEY = 'agritrack.recsDone';
   var RATE = 15; // transport cost per km used to compare markets
   var CATS = { water: 'Watering', weather: 'Weather', harvest: 'Harvest', market: 'Selling', care: 'Crop care' };
   var PRI = ['Urgent', 'This week', 'Plan ahead'];
@@ -29,12 +58,8 @@
   }
   var TODAY = todayKey();
   var done = {};
-  try {
-    var stored = JSON.parse(localStorage.getItem(DONE_KEY)) || {};
-    Object.keys(stored).forEach(function (k) { if (k.split('|')[1] === TODAY) done[k] = true; }); // old days reset
-    localStorage.setItem(DONE_KEY, JSON.stringify(done));
-  } catch (e) {}
-  function saveDone() { try { localStorage.setItem(DONE_KEY, JSON.stringify(done)); } catch (e) {} }
+  (DATA.done || []).forEach(function (k) { if (k.split('|')[1] === TODAY) done[k] = true; }); // old days reset
+  function saveDone(key, on) { onDone(key, on); }
   var isDone = function (r) { return !!done[r.id + '|' + TODAY]; };
 
   function kmBetween(lat1, lon1, lat2, lon2) {
@@ -99,13 +124,13 @@
             why: 'Soil moisture in ' + c.field + ' is ' + c.moisture + '%, below the healthy range of 35% or more.' + (c.stage === 'Seedling' ? ' Young seedlings dry out fastest.' : ''),
             steps: steps, link: link('crop-monitoring.php', 'View crop') });
         }
-      } else if (c.moisture < 50 && c.id !== 'rice') {
+      } else if (c.moisture < 50 && c.key !== 'rice') {
         add({ id: 'watersoon-' + c.id, pri: 2, cat: 'water', crop: c.name, due: 'Next 2 days',
           title: 'Plan watering for ' + c.name,
           why: 'Soil moisture in ' + c.field + ' is ' + c.moisture + '% and drifting toward the dry range.',
           steps: ['Water within the next two days unless rain arrives', 'Mulch around plants to hold moisture'],
           link: link('crop-monitoring.php', 'View crop') });
-      } else if (c.moisture > 78 && c.id !== 'rice' && wx) {
+      } else if (c.moisture > 78 && c.key !== 'rice' && wx) {
         var wet = 0; for (var k = 0; k < 3; k++) wet = Math.max(wet, dayInfo(k).rain);
         if (wet >= 60) {
           add({ id: 'drain-' + c.id, pri: 1, cat: 'water', crop: c.name, due: 'Before the rain',
@@ -143,9 +168,9 @@
 
       // Where to sell
       if (c.days <= 30 && c.days >= -5) {
-        var rows = DATA.markets.filter(function (m) { return m.prices[c.id] != null; }).map(function (m) {
+        var rows = DATA.markets.filter(function (m) { return (m.prices || {})[c.key] != null; }).map(function (m) {
           var dist = kmBetween(farm.lat, farm.lon, m.lat, m.lon);
-          return { m: m, dist: dist, price: m.prices[c.id], net: c.yield_t * 1000 * m.prices[c.id] - dist * 2 * RATE };
+          return { m: m, dist: dist, price: m.prices[c.key], net: c.yield_t * 1000 * m.prices[c.key] - dist * 2 * RATE };
         }).sort(function (a, b) { return b.net - a.net; });
         if (rows.length) {
           var b1 = rows[0], b2 = rows[1];
@@ -170,7 +195,7 @@
       } else if (c.stage === 'Flowering') {
         care = { t: 'Keep ' + c.name + ' water steady', s: ['Avoid water stress during flowering', 'Scout for pests', 'Avoid spraying in the midday heat'] };
       } else if (c.stage === 'Fruiting') {
-        care = c.id === 'rice'
+        care = c.key === 'rice'
           ? { t: 'Look after ' + c.name + ' during grain filling', s: ['Keep the field moist until grain filling finishes', 'Plan to drain the field about a week before harvest', 'Watch for rice bugs and birds'] }
           : { t: 'Watch ' + c.name + ' for pests and support the fruit', s: ['Check for fruit borers and disease', 'Support heavy plants with stakes', 'Water at the base, not over the leaves'] };
       }
@@ -268,12 +293,12 @@
     var urgent = open.filter(function (r) { return r.pri === 0; }).length;
     var week = open.filter(function (r) { return r.pri <= 1; }).length;
     var doneCount = recs.length - open.length;
-    var soon = DATA.crops.slice().sort(function (a, b) { return a.days - b.days; })[0];
+    var soon = DATA.crops.slice().sort(function (a, b) { return a.days - b.days; })[0] || { name: 'None', days: null };
     var cells = [
       ['Urgent', String(urgent), urgent ? 'Do these first' : 'Nothing urgent', urgent ? ' urgent' : ''],
       ['Needs action this week', String(week), 'Urgent and this-week items', ''],
       ['Done today', doneCount + ' of ' + recs.length, 'Resets each day', ''],
-      ['Next harvest', soon.name, dueText(soon.days), '']
+      ['Next harvest', soon.name, soon.days === null ? 'Add a crop in Crop monitoring' : dueText(soon.days), '']
     ];
     $('stats').innerHTML = cells.map(function (c) {
       return '<div class="rc-stat' + c[3] + '"><small>' + esc(c[0]) + '</small><b>' + esc(c[1]) + '</b><span>' + esc(c[2]) + '</span></div>';
@@ -325,8 +350,9 @@
   $('list').addEventListener('click', function (e) {
     var b = e.target.closest('[data-done]'); if (!b) return;
     var key = b.getAttribute('data-done') + '|' + TODAY;
-    if (done[key]) delete done[key]; else done[key] = true;
-    saveDone(); render();
+    var on = !done[key];
+    if (on) done[key] = true; else delete done[key];
+    saveDone(key, on); render();
   });
 
   function start() {
@@ -346,4 +372,4 @@
     .then(function (r) { if (!r.ok) throw new Error('bad response'); return r.json(); })
     .then(function (d) { wx = d; start(); })
     .catch(function () { $('notice').style.display = 'block'; wx = null; start(); });
-})();
+}

@@ -7,7 +7,6 @@ $icons = [
   'market'  => '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/>',
   'tips'    => '<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.7.6 1 1.3 1 2.1h5c0-.8.3-1.5 1-2.1A6 6 0 0 0 12 3Z"/>',
   'leaf'    => '<path d="M6 18c0-8 5-13 13-13 0 8-5 13-13 13Z"/><path d="M6 18 14 10"/>',
-  'search'  => '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
 ];
 function ic($k) { global $icons; return '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">' . $icons[$k] . '</svg>'; }
 
@@ -20,26 +19,7 @@ $nav = [
   ['recommendations.php', 'Recommendations', 'tips'],
 ];
 $current = 'market-locations.php';
-
-// Your crops (shared with Crop monitoring and Harvest management)
-require __DIR__ . '/crops-data.php';
-
-// Market listings are shared with Recommendations (edit them in markets-data.php)
-require __DIR__ . '/markets-data.php';
-
-$cropOptions = [];
-foreach ($crops as $c) {
-  $cropOptions[] = ['id' => $c['id'], 'name' => $c['name'], 'field' => $c['field'], 'yield_t' => $c['yield_t'], 'harvest' => $c['harvest']];
-}
-// Open with ?crop=tomato to preselect a crop; otherwise the crop that is harvested first
-$byHarvest = $crops;
-usort($byHarvest, function ($a, $b) { return strcmp($a['harvest'], $b['harvest']); });
-$default = $byHarvest[0]['id'];
-if (isset($_GET['crop'])) {
-  foreach ($crops as $c) { if ($c['id'] === $_GET['crop']) $default = $c['id']; }
-}
-$payload = json_encode(['markets' => $markets, 'crops' => $cropOptions, 'defaultCrop' => $default],
-  JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
+// Crops, markets and saved markets now come from Firebase (see assets/js/market-locations.js).
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -61,6 +41,7 @@ $payload = json_encode(['markets' => $markets, 'crops' => $cropOptions, 'default
       color: var(--ink); font-variant-numeric: tabular-nums;
     }
     .ml * { box-sizing: border-box; }
+    .ml [hidden] { display: none !important; }
     .ml-head { margin-bottom: 20px; }
     .ml-head h1 { margin: 0 0 4px; }
     .ml-head p { margin: 0; color: var(--muted); }
@@ -165,6 +146,8 @@ $payload = json_encode(['markets' => $markets, 'crops' => $cropOptions, 'default
     .ml-btn.primary:hover { background: var(--green); border-color: var(--green); color: #fff; }
 
     .ml-empty { display: none; padding: 40px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: 20px; }
+    .ml-empty b { display: block; color: var(--dark); font-size: 1.05rem; margin-bottom: 6px; }
+    .ml-empty a { color: var(--green); font-weight: 700; }
     .ml-foot { margin-top: 22px; font-size: .84rem; color: var(--muted); line-height: 1.6; }
 
     @media (max-width: 1100px) {
@@ -205,79 +188,86 @@ $payload = json_encode(['markets' => $markets, 'crops' => $cropOptions, 'default
       </span>
     </header>
 
-    <section class="ml-card ml-controls">
-      <div class="ml-row">
-        <div class="ml-field">
-          <label for="crop">Crop to sell</label>
-          <select id="crop"></select>
-        </div>
-        <div class="ml-field grow">
-          <label for="q">Search markets</label>
-          <input type="text" id="q" placeholder="Name or town, e.g. Calauan" autocomplete="off">
-        </div>
-        <div class="ml-field">
-          <label for="sort">Sort by</label>
-          <select id="sort">
-            <option value="net">Best net revenue</option>
-            <option value="price">Highest price</option>
-            <option value="near">Nearest first</option>
-          </select>
-        </div>
-      </div>
-      <div class="ml-row">
-        <div class="ml-field">
-          <label>Type</label>
-          <div class="ml-pills" id="types" role="group" aria-label="Market type">
-            <button type="button" class="ml-pill active" data-type="all">All</button>
-            <button type="button" class="ml-pill" data-type="public">Public market</button>
-            <button type="button" class="ml-pill" data-type="wholesale">Wholesale</button>
-            <button type="button" class="ml-pill" data-type="coop">Cooperative</button>
-            <button type="button" class="ml-pill" data-type="saved">Saved</button>
-          </div>
-        </div>
-        <div class="ml-field">
-          <label for="km">Within <b id="kmVal">40 km</b></label>
-          <input type="range" id="km" min="5" max="40" step="1" value="40">
-        </div>
-        <div class="ml-field" style="min-width:130px">
-          <label for="rate">Transport &#8369; per km</label>
-          <input type="number" id="rate" min="0" step="1" value="15">
-        </div>
-        <label class="ml-check"><input type="checkbox" id="onlyBuying" checked> Only markets that buy this crop</label>
-      </div>
-    </section>
-
-    <div class="ml-selling" id="selling"></div>
-
-    <section class="ml-stats" id="stats"></section>
-
-    <div class="ml-layout">
-      <div>
-        <div class="ml-list" id="list"></div>
-        <div class="ml-empty" id="empty">No markets match these filters. Try a larger distance or turn off "Only markets that buy this crop".</div>
-      </div>
-
-      <aside class="ml-card ml-map">
-        <h2>Map</h2>
-        <p>Your farm is the dark marker. Tap a market to see details and jump to its card.</p>
-        <div id="map"></div>
-        <div class="ml-legend">
-          <em style="--c:#1a9d5c">Public market</em>
-          <em style="--c:#e0a000">Wholesale</em>
-          <em style="--c:#3a86c8">Cooperative</em>
-        </div>
-      </aside>
+    <div class="ml-empty" id="noCrops">
+      <b>No crops to sell yet</b>
+      Add a crop that is still growing, then come back to see which markets pay the most for it.<br>
+      <a href="crop-monitoring.php">Go to Crop monitoring &rarr;</a>
     </div>
 
-    <p class="ml-foot">
-      Net revenue = expected yield &times; the market price, minus a round trip at your transport rate. It is an estimate and ignores loading, tolls and market fees.<br>
-      Map data &copy; OpenStreetMap contributors. Market listings, prices and hours are sample data and locations are approximate. Confirm with the market before you deliver.
-    </p>
+    <div id="mlBody">
+      <section class="ml-card ml-controls">
+        <div class="ml-row">
+          <div class="ml-field">
+            <label for="crop">Crop to sell</label>
+            <select id="crop"></select>
+          </div>
+          <div class="ml-field grow">
+            <label for="q">Search markets</label>
+            <input type="text" id="q" placeholder="Name or town, e.g. Calauan" autocomplete="off">
+          </div>
+          <div class="ml-field">
+            <label for="sort">Sort by</label>
+            <select id="sort">
+              <option value="net">Best net revenue</option>
+              <option value="price">Highest price</option>
+              <option value="near">Nearest first</option>
+            </select>
+          </div>
+        </div>
+        <div class="ml-row">
+          <div class="ml-field">
+            <label>Type</label>
+            <div class="ml-pills" id="types" role="group" aria-label="Market type">
+              <button type="button" class="ml-pill active" data-type="all">All</button>
+              <button type="button" class="ml-pill" data-type="public">Public market</button>
+              <button type="button" class="ml-pill" data-type="wholesale">Wholesale</button>
+              <button type="button" class="ml-pill" data-type="coop">Cooperative</button>
+              <button type="button" class="ml-pill" data-type="saved">Saved</button>
+            </div>
+          </div>
+          <div class="ml-field">
+            <label for="km">Within <b id="kmVal">40 km</b></label>
+            <input type="range" id="km" min="5" max="40" step="1" value="40">
+          </div>
+          <div class="ml-field" style="min-width:130px">
+            <label for="rate">Transport &#8369; per km</label>
+            <input type="number" id="rate" min="0" step="1" value="15">
+          </div>
+          <label class="ml-check"><input type="checkbox" id="onlyBuying" checked> Only markets that buy this crop</label>
+        </div>
+      </section>
+
+      <div class="ml-selling" id="selling"></div>
+
+      <section class="ml-stats" id="stats"></section>
+
+      <div class="ml-layout">
+        <div>
+          <div class="ml-list" id="list"></div>
+          <div class="ml-empty" id="empty">No markets match these filters. Try a larger distance or turn off "Only markets that buy this crop".</div>
+        </div>
+
+        <aside class="ml-card ml-map">
+          <h2>Map</h2>
+          <p>Your farm is the dark marker. Tap a market to see details and jump to its card.</p>
+          <div id="map"></div>
+          <div class="ml-legend">
+            <em style="--c:#1a9d5c">Public market</em>
+            <em style="--c:#e0a000">Wholesale</em>
+            <em style="--c:#3a86c8">Cooperative</em>
+          </div>
+        </aside>
+      </div>
+
+      <p class="ml-foot">
+        Net revenue = expected yield &times; the market price, minus a round trip at your transport rate. It is an estimate and ignores loading, tolls and market fees.<br>
+        Map data &copy; OpenStreetMap contributors. Market listings, prices and hours are sample data and locations are approximate. Confirm with the market before you deliver.
+      </p>
+    </div>
   </main>
 </div>
 
 <script type="module" src="../assets/js/auth.js"></script>
-<script>window.AGRITRACK_DATA = <?= $payload ?>;</script>
-<script src="../assets/js/markets.js"></script>
+<script type="module" src="../assets/js/market-locations.js"></script>
 </body>
 </html>

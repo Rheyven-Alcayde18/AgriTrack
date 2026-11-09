@@ -1,6 +1,6 @@
 // assets/js/dashboard.js
 // Dashboard: fills the weather panel using the place chosen on the Weather forecast page.
-// Also remembers ticked to-do items. Loaded by user/dashboard.php
+// Loaded by user/dashboard.php. Crops, tasks and charts are in dashboard-farm.js.
 // (needs the ids dashPlace, dashTemp, dashCondition, dashRain, dashHumidity, dashWind).
 (function () {
   var KEY = 'agritrack.location';
@@ -50,23 +50,4 @@
     .catch(function () {
       $('dashCondition').textContent = 'Weather unavailable';
     });
-})();
-
-// To do list: remember which tasks are ticked on this device
-(function () {
-  var boxes = document.querySelectorAll('.db-tasks input[type="checkbox"]');
-  var stamp = new Date().toDateString(); // ticks reset each day
-  boxes.forEach(function (box) {
-    var key = 'agritrack.task.' + box.getAttribute('data-task');
-    try {
-      var v = JSON.parse(localStorage.getItem(key));
-      box.checked = !!(v && v.day === stamp);
-    } catch (e) {}
-    box.addEventListener('change', function () {
-      try {
-        if (box.checked) localStorage.setItem(key, JSON.stringify({ day: stamp }));
-        else localStorage.removeItem(key);
-      } catch (e) {}
-    });
-  });
 })();

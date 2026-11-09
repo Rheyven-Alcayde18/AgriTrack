@@ -9,7 +9,6 @@ $icons = [
   'leaf'    => '<path d="M6 18c0-8 5-13 13-13 0 8-5 13-13 13Z"/><path d="M6 18 14 10"/>',
 ];
 function ic($k) { global $icons; return '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">' . $icons[$k] . '</svg>'; }
-function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
 $nav = [
   ['dashboard.php', 'Dashboard', 'home'],
@@ -20,36 +19,7 @@ $nav = [
   ['recommendations.php', 'Recommendations', 'tips'],
 ];
 $current = 'crop-monitoring.php';
-
-// Sample data. Replace with your Firestore/database records later.
-// status: ok = on track, soon = harvest soon, warn = needs attention
-$stages = ['Seedling', 'Vegetative', 'Flowering', 'Fruiting', 'Harvest ready'];
-$crops = [
-  ['name' => 'Rice',     'field' => 'Field A', 'area' => 5.0, 'stage' => 'Flowering',  'progress' => 72, 'planted' => '2026-07-27', 'harvest' => '2026-11-24', 'moisture' => 82, 'status' => 'ok',   'label' => 'On track',     'action' => 'Inspect flowering on Friday and keep water level steady.'],
-  ['name' => 'Corn',     'field' => 'Field B', 'area' => 3.5, 'stage' => 'Vegetative', 'progress' => 45, 'planted' => '2026-09-20', 'harvest' => '2027-01-08', 'moisture' => 61, 'status' => 'ok',   'label' => 'On track',     'action' => 'Apply fertilizer tomorrow.'],
-  ['name' => 'Tomato',   'field' => 'Field C', 'area' => 2.0, 'stage' => 'Fruiting',   'progress' => 88, 'planted' => '2026-08-30', 'harvest' => '2026-11-12', 'moisture' => 54, 'status' => 'soon', 'label' => 'Harvest soon', 'action' => 'Book transport and prepare crates for picking.'],
-  ['name' => 'Eggplant', 'field' => 'Field D', 'area' => 2.0, 'stage' => 'Seedling',   'progress' => 18, 'planted' => '2026-10-25', 'harvest' => '2027-02-10', 'moisture' => 28, 'status' => 'warn', 'label' => 'Needs water',  'action' => 'Water today. Soil moisture is below the healthy range.'],
-];
-
-$today = new DateTime('today');
-$totalArea = 0; $attention = 0; $soon = 0;
-foreach ($crops as &$c) {
-  $totalArea += $c['area'];
-  if ($c['status'] === 'warn') $attention++;
-  if ($c['status'] === 'soon') $soon++;
-  $d = new DateTime($c['harvest']);
-  $c['days'] = (int)$today->diff($d)->format('%r%a');
-  $c['stageIndex'] = array_search($c['stage'], $stages, true);
-  $c['moistureLow'] = $c['moisture'] < 35;
-}
-unset($c);
-
-$stats = [
-  ['Crops monitored', (string)count($crops), 'Across ' . count(array_unique(array_column($crops, 'field'))) . ' fields', 'crop'],
-  ['Total area', rtrim(rtrim(number_format($totalArea, 1), '0'), '.') . ' ha', 'Planted this season', 'market'],
-  ['Harvest soon', (string)$soon, 'Ready within two weeks', 'harvest'],
-  ['Need attention', (string)$attention, $attention ? 'Check the flagged crops' : 'Everything looks fine', 'tips'],
-];
+// No sample data here. Crops come from Firebase (see assets/js/crops.js).
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,16 +32,10 @@ $stats = [
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
   <style>
-    /* Crop monitoring page only. Every class is prefixed cm- so nothing clashes with dashboard.css */
+    /* Crop monitoring page only. Classes are prefixed cm- (page) and ag- (buttons, dialogs) */
     .cm {
-      --ink: #12382a;
-      --dark: #0c4a30;
-      --green: #1a9d5c;
-      --mint: #eef7f1;
-      --line: #e1eee6;
-      --muted: #6b8a7a;
-      color: var(--ink);
-      font-variant-numeric: tabular-nums;
+      --ink: #12382a; --dark: #0c4a30; --green: #1a9d5c; --mint: #eef7f1; --line: #e1eee6; --muted: #6b8a7a;
+      color: var(--ink); font-variant-numeric: tabular-nums;
     }
     .cm * { box-sizing: border-box; }
     .cm-head { margin-bottom: 24px; }
@@ -79,18 +43,21 @@ $stats = [
     .cm-head p { margin: 0; color: var(--muted); }
     .cm-head .cm-welcome:empty { display: none; }
 
-    /* Summary */
+    /* Summary (hidden while there are no crops) */
     .cm-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .cm:has(.ag-empty) .cm-stats { display: none; }
     .cm-stat { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
     .cm-stat small { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); }
     .cm-stat b { display: block; margin: 8px 0 2px; font-size: 1.7rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
     .cm-stat span { font-size: .82rem; color: var(--muted); }
     .cm-stat.warn b { color: #c0392b; }
 
-    /* Filters */
+    /* Bar + filters */
     .cm-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-    .cm-bar h2 { margin: 0; font-size: 1.15rem; color: var(--dark); }
+    .cm-title { display: flex; align-items: center; gap: 14px; }
+    .cm-title h2 { margin: 0; font-size: 1.15rem; color: var(--dark); }
     .cm-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+    .cm:has(.ag-empty) .cm-filters { display: none; }
     .cm-filter {
       font: inherit; font-size: .86rem; font-weight: 700; cursor: pointer; padding: 8px 16px; border-radius: 999px;
       background: #fff; color: var(--muted); border: 1px solid var(--line); transition: all .15s;
@@ -98,9 +65,26 @@ $stats = [
     .cm-filter:hover { color: var(--dark); border-color: var(--green); }
     .cm-filter.active { background: var(--dark); color: #fff; border-color: var(--dark); }
 
+    /* Buttons */
+    .ag-btn { font: inherit; font-size: .88rem; font-weight: 700; cursor: pointer; padding: 10px 18px; border-radius: 999px; border: 0; background: var(--dark); color: #fff; transition: background .15s; }
+    .ag-btn:hover { background: var(--green); }
+    .ag-btn:disabled { opacity: .6; cursor: default; }
+    .ag-ghost { font: inherit; font-size: .82rem; font-weight: 700; cursor: pointer; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--dark); transition: all .15s; }
+    .ag-ghost:hover { border-color: var(--green); color: var(--green); }
+    .ag-ghost.danger { color: #b13a2f; }
+    .ag-ghost.danger:hover { border-color: #d6453d; color: #d6453d; }
+    .ag-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+    /* Empty state: no crops added yet */
+    .ag-empty { padding: 48px 24px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: 20px; }
+    .ag-empty b { display: block; font-size: 1.1rem; color: var(--dark); margin-bottom: 6px; }
+    .ag-empty p { margin: 0 auto; max-width: 420px; }
+    .ag-empty .ag-actions { justify-content: center; }
+    .ag-empty [data-act="demo"] { display: none; }
+
     /* Crop cards */
     .cm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    .cm-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 24px; transition: box-shadow .15s, transform .15s; }
+    .cm-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 24px; transition: box-shadow .15s, transform .15s; scroll-margin-top: 16px; }
     .cm-card:hover { box-shadow: 0 10px 26px rgba(12,74,48,.09); transform: translateY(-2px); }
     .cm-card[hidden] { display: none; }
     .cm-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -113,8 +97,8 @@ $stats = [
     .cm-pill.ok { background: #e3f4ea; color: #15753f; }
     .cm-pill.soon { background: #fdf2d6; color: #9a6a00; }
     .cm-pill.warn { background: #fde6e3; color: #b13a2f; }
+    .cm-pill.done { background: #edf1ef; color: #5b756a; }
 
-    /* Growth stage tracker */
     .cm-steps { display: grid; grid-template-columns: repeat(5, 1fr); margin: 22px 0 8px; }
     .cm-step { position: relative; text-align: center; font-size: .7rem; font-weight: 600; color: #a6bcb0; padding-top: 22px; }
     .cm-step::before { content: ""; position: absolute; top: 5px; left: 50%; width: 11px; height: 11px; margin-left: -5.5px; border-radius: 50%; background: #dbe9e0; z-index: 1; }
@@ -147,7 +131,20 @@ $stats = [
     .cm-card[data-status="soon"] .cm-action { background: #fdf6e0; }
 
     .cm-empty { display: none; padding: 40px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: 20px; }
-    .cm-note { margin-top: 24px; font-size: .84rem; color: var(--muted); }
+
+    /* Dialogs */
+    .cm-dlg { border: 0; border-radius: 20px; padding: 0; width: min(520px, calc(100vw - 32px)); color: var(--ink); font-family: inherit; box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+    .cm-dlg::backdrop { background: rgba(8, 40, 26, .55); }
+    .cm-dlg form { padding: 24px; display: grid; gap: 14px; }
+    .cm-dlg h3 { margin: 0; font-size: 1.15rem; color: var(--dark); }
+    .cm-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .cm-dlg label { display: flex; flex-direction: column; gap: 6px; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .cm-dlg input { font: inherit; font-size: .92rem; font-weight: 400; letter-spacing: 0; text-transform: none; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: #fff; outline: none; width: 100%; }
+    .cm-dlg input:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(26,157,92,.12); }
+    .cm-err { margin: 0; min-height: 1.1em; font-size: .84rem; font-weight: 600; color: #b13a2f; }
+    .cm-dlg .ag-actions { justify-content: flex-end; margin-top: 0; }
+
+    .ag-toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 50; background: var(--dark); color: #fff; padding: 12px 20px; border-radius: 999px; font-size: .88rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
 
     @media (max-width: 1100px) {
       .cm-stats { grid-template-columns: repeat(2, 1fr); }
@@ -159,6 +156,7 @@ $stats = [
       .cm-facts { grid-template-columns: 1fr; }
       .cm-fact + .cm-fact { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); margin-top: 12px; }
       .cm-step { font-size: .62rem; }
+      .cm-grid2 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -181,18 +179,13 @@ $stats = [
       <p class="cm-welcome" id="welcome"></p>
     </header>
 
-    <section class="cm-stats">
-      <?php foreach ($stats as [$label, $value, $note, $icon]): ?>
-        <div class="cm-stat <?= ($label === 'Need attention' && $attention) ? 'warn' : '' ?>">
-          <small><?= h($label) ?></small>
-          <b><?= h($value) ?></b>
-          <span><?= h($note) ?></span>
-        </div>
-      <?php endforeach; ?>
-    </section>
+    <section class="cm-stats" id="stats"></section>
 
     <div class="cm-bar">
-      <h2>Your crops</h2>
+      <div class="cm-title">
+        <h2>Your crops</h2>
+        <button type="button" class="ag-btn" id="addCrop">+ Add crop</button>
+      </div>
       <div class="cm-filters" id="filters" role="group" aria-label="Filter crops">
         <button type="button" class="cm-filter active" data-filter="all">All</button>
         <button type="button" class="cm-filter" data-filter="ok">On track</button>
@@ -201,60 +194,65 @@ $stats = [
       </div>
     </div>
 
-    <section class="cm-grid" id="cropGrid">
-      <?php foreach ($crops as $c): ?>
-        <article class="cm-card" data-status="<?= h($c['status']) ?>">
-          <div class="cm-top">
-            <div class="cm-name">
-              <span class="cm-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><?= $icons['crop'] ?></svg></span>
-              <div>
-                <b><?= h($c['name']) ?></b>
-                <small><?= h($c['field']) ?> &middot; <?= h(rtrim(rtrim(number_format($c['area'], 1), '0'), '.')) ?> ha</small>
-              </div>
-            </div>
-            <span class="cm-pill <?= h($c['status']) ?>"><?= h($c['label']) ?></span>
-          </div>
-
-          <div class="cm-steps" aria-label="Growth stage: <?= h($c['stage']) ?>">
-            <?php foreach ($stages as $i => $s): ?>
-              <div class="cm-step <?= $i < $c['stageIndex'] ? 'done' : ($i === $c['stageIndex'] ? 'now' : '') ?>"><?= h($s) ?></div>
-            <?php endforeach; ?>
-          </div>
-
-          <div class="cm-prog" title="<?= (int)$c['progress'] ?>% grown">
-            <div class="cm-bar-track"><i style="width:<?= (int)$c['progress'] ?>%"></i></div>
-            <b><?= (int)$c['progress'] ?>%</b>
-          </div>
-
-          <div class="cm-facts">
-            <div class="cm-fact">
-              <small>Planted</small>
-              <b><?= h(date('M j', strtotime($c['planted']))) ?></b>
-              <span><?= h(date('Y', strtotime($c['planted']))) ?></span>
-            </div>
-            <div class="cm-fact">
-              <small>Harvest</small>
-              <b><?= h(date('M j', strtotime($c['harvest']))) ?></b>
-              <span><?= $c['days'] > 0 ? 'In ' . (int)$c['days'] . ' days' : ($c['days'] === 0 ? 'Today' : 'Ready now') ?></span>
-            </div>
-            <div class="cm-fact">
-              <small>Soil moisture</small>
-              <b><?= (int)$c['moisture'] ?>%</b>
-              <div class="cm-moist <?= $c['moistureLow'] ? 'low' : '' ?>"><i style="width:<?= (int)$c['moisture'] ?>%"></i></div>
-            </div>
-          </div>
-
-          <p class="cm-action"><b>Next:</b> <?= h($c['action']) ?></p>
-        </article>
-      <?php endforeach; ?>
-    </section>
+    <section class="cm-grid" id="cropGrid"></section>
     <div class="cm-empty" id="empty">No crops match this filter.</div>
-
-    <p class="cm-note">Figures shown are sample data until your farm records are connected.</p>
   </main>
 </div>
 
+<!-- Add / edit crop -->
+<dialog class="cm-dlg" id="cropDlg">
+  <form id="cropForm" novalidate>
+    <h3 id="cropTitle">Add crop</h3>
+    <div class="cm-grid2">
+      <label>Crop <input name="name" type="text" list="cropNames" placeholder="e.g. Rice" autocomplete="off"></label>
+      <label>Field <input name="field" type="text" placeholder="e.g. Field A" autocomplete="off"></label>
+      <label>Area (ha) <input name="area" type="number" min="0" step="0.1"></label>
+      <label>Soil moisture (%) <input name="moisture" type="number" min="0" max="100" step="1" value="60"></label>
+      <label>Planted <input name="planted" type="date"></label>
+      <label>Harvest date <input name="harvest" type="date"></label>
+      <label>Expected yield (t) <input name="yield_t" type="number" min="0" step="0.1"></label>
+      <label>Price (&#8369;/kg) <input name="price" type="number" min="0" step="0.5"></label>
+    </div>
+    <datalist id="cropNames"><option value="Rice"><option value="Corn"><option value="Tomato"><option value="Eggplant"></datalist>
+    <p class="cm-err" id="cropErr" role="alert"></p>
+    <div class="ag-actions">
+      <button type="button" class="ag-ghost" data-close>Cancel</button>
+      <button type="submit" class="ag-btn" id="cropSave">Save crop</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Log soil moisture -->
+<dialog class="cm-dlg" id="moistDlg">
+  <form id="moistForm" novalidate>
+    <h3 id="moistTitle">Log soil moisture</h3>
+    <label>Soil moisture (%) <input name="moisture" type="number" min="0" max="100" step="1"></label>
+    <p class="cm-err" id="moistErr" role="alert"></p>
+    <div class="ag-actions">
+      <button type="button" class="ag-ghost" data-close>Cancel</button>
+      <button type="submit" class="ag-btn">Save reading</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Record harvest -->
+<dialog class="cm-dlg" id="harvDlg">
+  <form id="harvForm" novalidate>
+    <h3 id="harvTitle">Record harvest</h3>
+    <div class="cm-grid2">
+      <label>Date <input name="date" type="date"></label>
+      <label>Yield (t) <input name="yield_t" type="number" min="0" step="0.1"></label>
+      <label>Price (&#8369;/kg) <input name="price" type="number" min="0" step="0.5"></label>
+    </div>
+    <p class="cm-err" id="harvErr" role="alert"></p>
+    <div class="ag-actions">
+      <button type="button" class="ag-ghost" data-close>Cancel</button>
+      <button type="submit" class="ag-btn">Save harvest</button>
+    </div>
+  </form>
+</dialog>
+
 <script type="module" src="../assets/js/auth.js"></script>
-<script src="../assets/js/crops.js"></script>
+<script type="module" src="../assets/js/crops.js"></script>
 </body>
 </html>

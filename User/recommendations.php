@@ -19,23 +19,7 @@ $nav = [
   ['recommendations.php', 'Recommendations', 'tips'],
 ];
 $current = 'recommendations.php';
-
-// Same records as every other page
-require __DIR__ . '/crops-data.php';
-require __DIR__ . '/markets-data.php';
-
-$today = new DateTime('today');
-$cropRows = [];
-foreach ($crops as $c) {
-  $cropRows[] = [
-    'id' => $c['id'], 'name' => $c['name'], 'field' => $c['field'], 'area' => $c['area'],
-    'stage' => $c['stage'], 'progress' => $c['progress'], 'moisture' => $c['moisture'],
-    'harvest' => $c['harvest'], 'days' => (int)$today->diff(new DateTime($c['harvest']))->format('%r%a'),
-    'yield_t' => $c['yield_t'], 'prep' => $c['prep'],
-  ];
-}
-$payload = json_encode(['crops' => $cropRows, 'markets' => $markets],
-  JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
+// Crops, markets and ticked items now come from Firebase (see assets/js/recommendations-page.js).
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -204,14 +188,13 @@ $payload = json_encode(['crops' => $cropRows, 'markets' => $markets],
     <div class="rc-empty" id="empty">Nothing to do here. Nice work.</div>
 
     <p class="rc-foot">
-      Recommendations are generated from your crop records, today's Open-Meteo forecast and the market listings. They are general guidance, so adjust them to your own field conditions.
-      Completed items reset each day. Crop, market and price figures are sample data until your farm records are connected.
+      Recommendations are generated from the crops you added, today's Open-Meteo forecast and the market listings. They are general guidance, so adjust them to your own field conditions.
+      Completed items reset each day. Market listings and prices are sample data.
     </p>
   </main>
 </div>
 
 <script type="module" src="../assets/js/auth.js"></script>
-<script>window.AGRITRACK_DATA = <?= $payload ?>;</script>
-<script src="../assets/js/recommendations.js"></script>
+<script type="module" src="../assets/js/recommendations.js"></script>
 </body>
 </html>

@@ -1,11 +1,10 @@
 // assets/js/farmers.js
 // Admin > Manage farmers: search, filter, profile drawer (crops, activities, harvests, saved markets),
 // edit farmer information and activate / deactivate accounts.
-// Loaded by admin/manage-farmers.php, which first sets window.AGRITRACK_FARMERS (farmers + markets) from PHP.
-// Edits are kept in localStorage for now. Replace save() with a Firestore/database write when it is connected.
+// Loaded by manage-farmers.js, which reads Firebase and first sets window.AGRITRACK_FARMERS = { farmers, markets }
+// and window.AGRITRACK_ON_EDIT(id, patch), which writes the change to users/{id} in Firebase.
 (function () {
   var DATA = window.AGRITRACK_FARMERS || { farmers: [], markets: {} };
-  var EDIT_KEY = 'agritrack.farmerEdits';
   var TYPE_LABEL = { public: 'Public market', wholesale: 'Wholesale', coop: 'Cooperative' };
   var STATUS_LABEL = { ok: 'On track', soon: 'Harvest soon', warn: 'Needs attention', done: 'Harvested' };
 
@@ -34,9 +33,19 @@
   }
 
   /* ---------- Data and edits ---------- */
+  // 'edits' holds changes already saved to Firebase, laid over the loaded records until the next reload
   var edits = {};
-  try { edits = JSON.parse(localStorage.getItem(EDIT_KEY)) || {}; } catch (e) {}
-  function persist() { try { localStorage.setItem(EDIT_KEY, JSON.stringify(edits)); } catch (e) {} }
+  function save(id, patch, after) {
+    var hook = window.AGRITRACK_ON_EDIT;
+    Promise.resolve(hook ? hook(id, patch) : null).then(function () {
+      edits[id] = edits[id] || {};
+      for (var k in patch) edits[id][k] = patch[k];
+      after();
+    }).catch(function (e) {
+      state.msg = 'Could not save: ' + ((e && (e.code || e.message)) || 'unknown error');
+      renderDrawer();
+    });
+  }
 
   function merged(f) {
     var o = edits[f.id];
@@ -235,12 +244,11 @@
       ? 'Deactivate ' + f.name + '? They will not be able to sign in until you activate the account again.'
       : 'Activate ' + f.name + '’s account?');
     if (!ok) return;
-    edits[id] = edits[id] || {};
-    edits[id].status = next;
-    persist();
-    state.msg = next === 'active' ? 'Account activated.' : 'Account deactivated.';
-    state.tab = 'overview'; state.editing = false;
-    renderDrawer(); renderList();
+    save(id, { status: next }, function () {
+      state.msg = next === 'active' ? 'Account activated.' : 'Account deactivated.';
+      state.tab = 'overview'; state.editing = false;
+      renderDrawer(); renderList();
+    });
   }
 
   function saveEdit(form) {
@@ -254,12 +262,10 @@
     var size = parseFloat(v.farm_size);
     if (!isFinite(size) || size <= 0 || size > 1000) fail('farm_size', 'Enter a size above 0 and up to 1000 ha.');
     if (bad) return;
-    edits[f.id] = edits[f.id] || {};
-    edits[f.id].name = v.name; edits[f.id].phone = v.phone; edits[f.id].municipality = v.municipality;
-    edits[f.id].barangay = v.barangay; edits[f.id].farm_size = size;
-    persist();
-    state.editing = false; state.tab = 'overview'; state.msg = 'Changes saved.';
-    renderDrawer(); renderList();
+    save(f.id, { name: v.name, phone: v.phone, municipality: v.municipality, barangay: v.barangay, farm_size: size }, function () {
+      state.editing = false; state.tab = 'overview'; state.msg = 'Changes saved.';
+      renderDrawer(); renderList();
+    });
   }
 
   /* ---------- Events ---------- */
@@ -292,12 +298,6 @@
   });
   $('drawer').addEventListener('submit', function (e) {
     if (e.target && e.target.id === 'editForm') { e.preventDefault(); saveEdit(e.target); }
-  });
-
-  $('resetEdits').addEventListener('click', function () {
-    if (!window.confirm('Remove all edits and status changes made in this browser?')) return;
-    edits = {}; persist(); state.msg = '';
-    renderList(); if (state.selected) renderDrawer();
   });
 
   renderList();

@@ -22,42 +22,6 @@ $nav = [
 ];
 $current = 'dashboard.php';
 
-// Crop records shared with Crop monitoring and Harvest management (edit them in crops-data.php)
-require __DIR__ . '/crops-data.php';
-
-$today = new DateTime('today');
-$totalArea = 0; $totalYield = 0; $needWater = [];
-foreach ($crops as &$c) {
-  $totalArea += $c['area'];
-  $totalYield += $c['yield_t'];
-  $c['days'] = (int)$today->diff(new DateTime($c['harvest']))->format('%r%a');
-  if ($c['status'] === 'warn') $needWater[] = $c;
-}
-unset($c);
-$byHarvest = $crops;
-usort($byHarvest, function ($x, $y) { return strcmp($x['harvest'], $y['harvest']); });
-$nextCrop = $byHarvest[0];
-$fieldCount = count(array_unique(array_column($crops, 'field')));
-
-function daysText($d) { return $d > 0 ? 'In ' . $d . ' day' . ($d === 1 ? '' : 's') : ($d === 0 ? 'Today' : 'Ready now'); }
-
-$stats = [
-  ['Active crops', (string)count($crops), count($needWater) ? count($needWater) . ' need attention' : 'All on track'],
-  ['Total area', num($totalArea) . ' ha', 'Across ' . $fieldCount . ' fields'],
-  ['Next harvest', date('M j', strtotime($nextCrop['harvest'])), $nextCrop['name'] . ', ' . $nextCrop['field']],
-  ['Expected yield', num($totalYield) . ' t', 'Across ' . count($crops) . ' crops'],
-];
-
-// Sample data until your farm records are connected
-$yield = ['Jun' => 3.2, 'Jul' => 4.1, 'Aug' => 3.8, 'Sep' => 5.0, 'Oct' => 4.6, 'Nov' => 6.2];
-$max = max($yield);
-$lastMonth = array_key_last($yield);
-$tasks = [
-  ['Water Field D', 'Today'],
-  ['Apply fertilizer, Field B', 'Tomorrow'],
-  ['Inspect the rice field', 'Friday'],
-  ['Book transport for tomatoes', 'Tuesday'],
-];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,6 +33,7 @@ $tasks = [
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/agri-ui.css">
   <style>
     /* Dashboard page only. Every class is prefixed db- so nothing clashes with dashboard.css */
     .db {
@@ -189,22 +154,9 @@ $tasks = [
       <p><?= date('l, F j') ?>. Here is how your farm is doing today.</p>
     </header>
 
-    <?php if ($needWater): $w = $needWater[0]; ?>
-      <div class="db-alert">
-        <span><b><?= h($w['name']) ?> in <?= h($w['field']) ?> needs water.</b> Soil moisture is <?= (int)$w['moisture'] ?>%, below the healthy range.</span>
-        <a class="db-link" href="recommendations.php">See recommendations &rarr;</a>
-      </div>
-    <?php endif; ?>
+    <div id="alertBox"></div>
 
-    <section class="db-stats">
-      <?php foreach ($stats as [$label, $value, $note]): ?>
-        <div class="db-stat">
-          <small><?= h($label) ?></small>
-          <b><?= h($value) ?></b>
-          <span><?= h($note) ?></span>
-        </div>
-      <?php endforeach; ?>
-    </section>
+    <section class="db-stats" id="stats" aria-live="polite"></section>
 
     <div class="db-cols">
       <div class="db-stack">
@@ -213,31 +165,14 @@ $tasks = [
             <h2>Crop progress</h2>
             <a class="db-link" href="crop-monitoring.php">View all &rarr;</a>
           </div>
-          <?php foreach ($crops as $c): ?>
-            <div class="db-crop">
-              <div><b><?= h($c['name']) ?></b><small><?= h($c['field']) ?> &middot; <?= h($c['stage']) ?></small></div>
-              <div class="db-bar" title="<?= (int)$c['progress'] ?>% grown">
-                <div class="tr"><i style="width:<?= (int)$c['progress'] ?>%"></i></div>
-                <span><?= (int)$c['progress'] ?>%</span>
-              </div>
-              <span class="db-pill <?= h($c['status']) ?>"><?= h($c['label']) ?></span>
-            </div>
-          <?php endforeach; ?>
+          <div id="cropList"><div class="ag-loading">Loading&hellip;</div></div>
         </section>
 
         <section class="db-card">
           <div class="db-card-head">
-            <h2>Yield per month (tons)</h2>
+            <h2>Harvested per month (tons)</h2>
           </div>
-          <div class="db-chart">
-            <?php foreach ($yield as $m => $v): ?>
-              <div class="db-col<?= $m === $lastMonth ? ' now' : '' ?>">
-                <em><?= h($v) ?></em>
-                <div class="bar" style="height:<?= round($v / $max * 150) ?>px"></div>
-                <small><?= h($m) ?></small>
-              </div>
-            <?php endforeach; ?>
-          </div>
+          <div class="db-chart" id="yieldChart"></div>
         </section>
       </div>
 
@@ -262,33 +197,24 @@ $tasks = [
             <h2>Up next</h2>
             <a class="db-link" href="harvest-management.php">Harvest plan &rarr;</a>
           </div>
-          <?php foreach (array_slice($byHarvest, 0, 3) as $c): ?>
-            <div class="db-next">
-              <div class="db-date"><small><?= h(date('M', strtotime($c['harvest']))) ?></small><b><?= h(date('j', strtotime($c['harvest']))) ?></b></div>
-              <div class="db-next-info"><b><?= h($c['name']) ?></b><small><?= h($c['field']) ?> &middot; <?= h(num($c['yield_t'])) ?> t expected</small></div>
-              <span class="db-next-days"><?= h(daysText($c['days'])) ?></span>
-            </div>
-          <?php endforeach; ?>
+          <div id="nextList"></div>
         </section>
 
         <section class="db-card">
           <div class="db-card-head">
             <h2>To do</h2>
           </div>
-          <ul class="db-tasks">
-            <?php foreach ($tasks as $i => [$t, $when]): ?>
-              <li><input type="checkbox" id="t<?= $i ?>" data-task="<?= h($t) ?>"><label for="t<?= $i ?>"><?= h($t) ?></label><small><?= h($when) ?></small></li>
-            <?php endforeach; ?>
-          </ul>
+          <ul class="db-tasks" id="tasks"></ul>
         </section>
       </div>
     </div>
 
-    <p class="db-note">Crop, area and yield figures are sample data until your farm records are connected. Weather is live.</p>
+    <p class="db-note">Crops, harvests and tasks come from your account in Firebase. Weather is live.</p>
   </main>
 </div>
 
 <script type="module" src="../assets/js/auth.js"></script>
 <script src="../assets/js/dashboard.js"></script>
+<script type="module" src="../assets/js/dashboard-farm.js"></script>
 </body>
 </html>

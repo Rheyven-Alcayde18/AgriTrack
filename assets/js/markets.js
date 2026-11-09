@@ -1,10 +1,10 @@
 // assets/js/markets.js
 // Market locations: crop picker, filters, net-revenue ranking, saved markets and the Leaflet/OpenStreetMap map.
-// Loaded by user/market-locations.php, which first sets window.AGRITRACK_DATA (markets + crops) from PHP and loads Leaflet.
+// Loaded by market-locations.js (after it reads Firebase), which first sets window.AGRITRACK_DATA = { markets, crops, saved, defaultCrop }
+// and window.AGRITRACK_ON_SAVE(marketId, isSaved) to store a saved market in Firebase.
 (function () {
-  var DATA = window.AGRITRACK_DATA || { crops: [], markets: [] };
+  var DATA = window.AGRITRACK_DATA || { crops: [], markets: [], saved: [] };
   var DEFAULT_FARM = { name: 'Bay, Laguna, Philippines', lat: 14.1833, lon: 121.2833 };
-  var SAVED_KEY = 'agritrack.savedMarkets';
   var TYPE_LABEL = { public: 'Public market', wholesale: 'Wholesale', coop: 'Cooperative' };
   var TYPE_COLOR = { public: '#1a9d5c', wholesale: '#e0a000', coop: '#3a86c8' };
   var DAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -26,9 +26,8 @@
   var farm = getFarm();
   $('fromName').textContent = farm.name;
 
-  var saved = [];
-  try { saved = JSON.parse(localStorage.getItem(SAVED_KEY)) || []; } catch (e) {}
-  function persistSaved() { try { localStorage.setItem(SAVED_KEY, JSON.stringify(saved)); } catch (e) {} }
+  var saved = (DATA.saved || []).slice();
+  function persistSaved(id, on) { if (window.AGRITRACK_ON_SAVE) window.AGRITRACK_ON_SAVE(id, on); }
 
   var state = { crop: DATA.defaultCrop, q: '', type: 'all', km: 40, sort: 'net', rate: 15, onlyBuying: true, selected: null };
 
@@ -73,7 +72,7 @@
     var crop = cropById[state.crop];
     return DATA.markets.map(function (m) {
       var dist = km(farm.lat, farm.lon, m.lat, m.lon);
-      var price = m.prices[crop.id];
+      var price = (m.prices || {})[crop.key];
       var buys = price != null;
       var gross = buys ? crop.yield_t * 1000 * price : null;
       var trans = dist * 2 * state.rate;
@@ -134,8 +133,8 @@
     $('empty').style.display = list.length ? 'none' : 'block';
     $('list').innerHTML = list.map(function (r, i) {
       var m = r.m, isBest = best && r === best && r.price != null;
-      var chips = Object.keys(m.prices).map(function (id) {
-        return '<span class="ml-chip' + (id === state.crop ? ' on' : '') + '">' + esc(cropById[id].name) + ' ' + peso(m.prices[id]) + '</span>';
+      var chips = Object.keys(m.prices || {}).map(function (id) {
+        return '<span class="ml-chip' + (id === crop.key ? ' on' : '') + '">' + esc(id.charAt(0).toUpperCase() + id.slice(1)) + ' ' + peso(m.prices[id]) + '</span>';
       }).join('');
       var money = r.price != null
         ? '<div class="ml-meta">' +
@@ -277,7 +276,7 @@
     if (star) {
       var id = star.getAttribute('data-save'), i = saved.indexOf(id);
       if (i > -1) saved.splice(i, 1); else saved.push(id);
-      persistSaved(); render(); return;
+      persistSaved(id, i === -1); render(); return;
     }
     var cardEl = e.target.closest('.ml-m');
     if (cardEl && !e.target.closest('a, button')) {
