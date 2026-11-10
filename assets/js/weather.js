@@ -1,6 +1,8 @@
 // assets/js/weather.js
 // Used by weather-forecast.php. The Dashboard has its own inline script.
 
+import { requireUser, farmLocation } from './db.js';
+
 const KEY = 'agritrack.location';
 const DEFAULT = { name: 'Bay, Laguna, Philippines', lat: 14.1833, lon: 121.2833 };
 
@@ -186,7 +188,7 @@ function initWeatherPage() {
         return;
       }
       loc = found;
-      saveLocation(loc); // remembered for next visit and for the Dashboard
+      // Searching is just a look at another place. The farm location stays fixed.
       $('place').value = '';
       await load();
     } catch (e) {
@@ -195,12 +197,23 @@ function initWeatherPage() {
   });
 
   $('resetLoc').addEventListener('click', () => {
-    loc = { ...DEFAULT };
-    saveLocation(loc);
+    loc = FARM || { ...DEFAULT };
     load();
   });
 
   load();
 }
 
-if ($('searchForm')) initWeatherPage();
+// The weather page opens on the signed-in farmer's own farm location
+let FARM = null;
+if ($('searchForm')) {
+  const session = await requireUser();
+  FARM = farmLocation(session.profile);
+  if (FARM) {
+    saveLocation(FARM);
+    // The page text says "Reset to Bay, Laguna". Show the farmer's own place instead.
+    const reset = $('resetLoc');
+    if (reset) reset.textContent = 'Reset to ' + FARM.name.replace(/, Philippines$/, '');
+  }
+  initWeatherPage();
+}

@@ -103,6 +103,42 @@
                     </div>
                 </div>
 
+                <!-- FARM LOCATION (fixed once the account is created) -->
+                <div class="mb-3">
+                    <label for="municipality" class="form-label">Farm municipality / city (Laguna)</label>
+
+                    <div class="input-container">
+                        <i class="ph-duotone ph-map-pin" aria-hidden="true"></i>
+
+                        <select class="form-control" id="municipality" name="municipality" required>
+                            <option value="">Choose where your farm is</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="barangay" class="form-label">Farm barangay</label>
+
+                    <div class="input-container">
+                        <i class="ph-duotone ph-house-line" aria-hidden="true"></i>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="barangay"
+                            name="barangay"
+                            placeholder="Enter your barangay"
+                            required
+                            maxlength="80"
+                            autocomplete="off">
+                    </div>
+
+                    <small class="field-hint" id="gpsText" aria-live="polite">
+                        Your farm location is set once and cannot be changed later.
+                        <a href="#" id="useGps">Use my current location for an exact pin</a>
+                    </small>
+                </div>
+
                 <!-- EMAIL -->
                 <div class="mb-3">
                     <label for="email" class="form-label">Email address</label>
@@ -227,6 +263,8 @@
         serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
+    import { TOWN_COORDS, todayISO } from "./assets/js/db.js";
+
 
     // GET HTML ELEMENTS
     const registerForm = document.getElementById("registerForm");
@@ -242,6 +280,42 @@
     const loadingSpinner = document.getElementById("loadingSpinner");
 
     const togglePassword = document.getElementById("togglePassword");
+
+    const municipalityInput = document.getElementById("municipality");
+    const barangayInput = document.getElementById("barangay");
+    const gpsText = document.getElementById("gpsText");
+
+    // FARM LOCATION: town list, plus an optional exact pin from the device
+    Object.keys(TOWN_COORDS).forEach(function (town) {
+        const option = document.createElement("option");
+        option.value = town;
+        option.textContent = town;
+        municipalityInput.appendChild(option);
+    });
+
+    let gpsPin = null;
+
+    document.getElementById("useGps").addEventListener("click", function (event) {
+        event.preventDefault();
+        if (!navigator.geolocation) {
+            gpsText.textContent = "This browser cannot share its location. Choose your town and barangay instead.";
+            return;
+        }
+        gpsText.textContent = "Asking your device for its location...";
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                gpsPin = {
+                    lat: Math.round(position.coords.latitude * 1e5) / 1e5,
+                    lon: Math.round(position.coords.longitude * 1e5) / 1e5
+                };
+                gpsText.textContent = "Exact pin saved (" + gpsPin.lat.toFixed(4) + ", " + gpsPin.lon.toFixed(4) + "). Also choose your town and barangay.";
+            },
+            function () {
+                gpsText.textContent = "Location was blocked. Choose your town and barangay instead.";
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    });
 
     const strengthMeter = document.getElementById("strengthMeter");
     const strengthText = document.getElementById("strengthText");
@@ -268,7 +342,7 @@
     }
 
     // CLEAR THE INVALID MARK AS SOON AS THE PERSON EDITS THE FIELD
-    [fullNameInput, emailInput, passwordInput, confirmPasswordInput].forEach(function (input) {
+    [fullNameInput, municipalityInput, barangayInput, emailInput, passwordInput, confirmPasswordInput].forEach(function (input) {
         input.addEventListener("input", function () {
             input.removeAttribute("aria-invalid");
         });
@@ -328,6 +402,8 @@
         messageBox.className = "alert d-none";
 
         const fullName = fullNameInput.value.trim();
+        const municipality = municipalityInput.value;
+        const barangay = barangayInput.value.trim();
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
@@ -336,6 +412,18 @@
         if (!fullName) {
             showMessage("Please enter your full name.", "danger");
             flagField(fullNameInput);
+            return;
+        }
+
+        if (!municipality) {
+            showMessage("Please choose the municipality or city of your farm.", "danger");
+            flagField(municipalityInput);
+            return;
+        }
+
+        if (!barangay) {
+            showMessage("Please enter the barangay of your farm.", "danger");
+            flagField(barangayInput);
             return;
         }
 
@@ -364,11 +452,23 @@
             await updateProfile(user, { displayName: fullName });
 
             // SAVE USER PROFILE TO REALTIME DATABASE
+            // The farm location is saved here once. Everything else in AgriTrack (weather, markets,
+            // recommendations and the admin pages) reads it from this profile.
+            const town = TOWN_COORDS[municipality];
+
             await set(ref(database, "users/" + user.uid), {
+                name: fullName,
                 fullName: fullName,
                 email: email,
                 role: "user",
-                createdAt: serverTimestamp()
+                status: "active",
+                joined: todayISO(),
+                createdAt: serverTimestamp(),
+                municipality: municipality,
+                barangay: barangay,
+                lat: gpsPin ? gpsPin.lat : town[0],
+                lon: gpsPin ? gpsPin.lon : town[1],
+                locationSource: gpsPin ? "gps" : "town"
             });
 
             showMessage("Registration successful! Redirecting to login...", "success");
@@ -376,6 +476,7 @@
             registerForm.reset();
             strengthMeter.dataset.level = 0;
             strengthText.textContent = "Use at least 6 characters.";
+            gpsPin = null;
 
             // SIGN OUT SO USER CAN SIGN IN NORMALLY (the account and profile remain saved)
             await auth.signOut();

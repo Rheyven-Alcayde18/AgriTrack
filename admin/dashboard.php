@@ -29,6 +29,7 @@ $current = 'dashboard.php';
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     /* Admin dashboard only. Every class is prefixed ad- so nothing clashes with dashboard.css */
     .ad {
@@ -93,6 +94,8 @@ $current = 'dashboard.php';
     .ad-pill.warn { background: #fde6e3; color: #b13a2f; }
     .ad-none { margin: 0; padding: 18px 0 6px; text-align: center; color: var(--muted); font-size: .9rem; }
 
+    .ad-map { height: 360px; border-radius: 14px; border: 1px solid var(--line); z-index: 0; }
+    .ad-pin b { color: var(--dark); }
     .ad-empty { display: none; margin-bottom: 16px; padding: 36px 24px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: 20px; }
     .ad-empty b { display: block; color: var(--dark); font-size: 1.1rem; margin-bottom: 6px; }
     .ad-empty a { color: var(--green); font-weight: 700; }
@@ -162,6 +165,13 @@ $current = 'dashboard.php';
       </section>
     </div>
 
+    <section class="ad-card" style="margin-bottom:16px">
+      <h2>Farmer locations</h2>
+      <p>Each pin is a farm. Pins without a GPS fix sit near the town centre.</p>
+      <div class="ad-map" id="farmMap" role="img" aria-label="Map of farmer locations"></div>
+      <p class="ad-none" id="mapNone" style="display:none">No farmer has set a location yet. Farmers are asked for it the next time they sign in.</p>
+    </section>
+
     <div class="ad-grid even">
       <section class="ad-card">
         <h2>Needs attention</h2>
@@ -177,6 +187,7 @@ $current = 'dashboard.php';
   </main>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module" src="../assets/js/auth.js"></script>
 <script type="module" src="../assets/js/admin-dashboard.js"></script>
 </body>

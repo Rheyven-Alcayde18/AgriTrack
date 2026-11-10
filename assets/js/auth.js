@@ -24,8 +24,8 @@ async function loadProfile(user, name) {
   if (snap.exists()) return snap.val();
   const profile = {
     name: name || user.displayName || (user.email || "").split("@")[0] || "Farmer",
-    email: user.email || "", phone: "", municipality: "Bay", barangay: "", farm_size: 0,
-    role: "farmer", status: "active", joined: today(), lastActive: today()
+    email: user.email || "", phone: "", municipality: "", barangay: "", farm_size: 0,
+    role: "user", status: "active", joined: today(), lastActive: today()
   };
   await set(r, profile);
   return profile;

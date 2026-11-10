@@ -5,7 +5,7 @@
 // Loaded by admin/manage-farmers.php.
 import {
   requireUser, listAllUsers, listAll, loadMarkets, updateUser, seedSample, clearSample,
-  derive, toList, bootClassic, toast, showError
+  derive, toList, bootClassic, toast, showError, explain, TOWN_COORDS
 } from "./db.js";
 
 const $ = (id) => document.getElementById(id);
@@ -17,7 +17,7 @@ requireUser({ role: "admin" }).then(async () => {
     ]);
     const farmers = users.filter((u) => u.role !== "admin").map((u) => ({
       id: u.id, name: u.name || "(no name)", email: u.email || "", phone: u.phone || "",
-      municipality: u.municipality || "", barangay: u.barangay || "", farm_size: Number(u.farm_size) || 0,
+      municipality: u.municipality || "", barangay: u.barangay || "", lat: Number(u.lat) || null, lon: Number(u.lon) || null, locSource: u.locationSource || "", farm_size: Number(u.farm_size) || 0,
       joined: u.joined || "2026-01-01", last_active: u.lastActive || u.joined || "2026-01-01",
       status: u.status === "inactive" ? "inactive" : "active",
       crops: toList(crops[u.id]).filter((c) => c.planted && c.harvest).map(derive),
@@ -28,11 +28,17 @@ requireUser({ role: "admin" }).then(async () => {
     const marketInfo = {};
     markets.forEach((m) => { marketInfo[m.id] = { name: m.name, town: m.town, type: m.type }; });
 
-    window.AGRITRACK_ON_EDIT = (id, patch) => updateUser(id, patch);
+    window.AGRITRACK_ON_EDIT = (id, patch) => {
+      const f = farmers.find((x) => x.id === id);
+      const c = TOWN_COORDS[patch.municipality];
+      // A new municipality moves the farm to that town's centre (an existing exact pin is kept if the town is unchanged)
+      if (c && f && patch.municipality !== f.municipality) patch = Object.assign({}, patch, { lat: c[0], lon: c[1], locationSource: "town" });
+      return updateUser(id, patch);
+    };
     bootClassic({ farmers, markets: marketInfo }, "../assets/js/farmers.js", "AGRITRACK_FARMERS");
   } catch (e) {
     console.error(e);
-    showError("Could not load farmers. " + (e.code === "PERMISSION_DENIED" ? "Publish database.rules.json in Firebase and make sure your account has role admin." : "Check your connection."));
+    showError(explain(e, "Could not load farmers."));
   }
 });
 

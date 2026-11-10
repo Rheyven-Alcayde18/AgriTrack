@@ -120,7 +120,7 @@
       var on = f.status === 'active';
       return '<tr class="' + (on ? '' : 'off') + '" data-open="' + esc(f.id) + '" tabindex="0">' +
         '<td><div class="mf-who"><span class="mf-av">' + esc(initials(f.name)) + '</span><div><b>' + esc(f.name) + '</b><small>' + esc(f.email) + '</small></div></div></td>' +
-        '<td>' + esc(f.municipality) + '<br><small style="color:var(--muted)">Brgy. ' + esc(f.barangay) + '</small></td>' +
+        '<td>' + esc(f.municipality || 'Not set') + '<br><small style="color:var(--muted)">' + (f.barangay ? 'Brgy. ' + esc(f.barangay) : '') + '</small></td>' +
         '<td><div class="mf-chips">' + (f.crops.length ? f.crops.map(function (c) { return '<span class="mf-chip">' + esc(c.name) + '</span>'; }).join('') : '<span class="mf-chip">None</span>') + '</div></td>' +
         '<td>' + num(f.farm_size) + ' ha</td>' +
         '<td><span class="mf-tag ' + f.status + '">' + (on ? 'Active' : 'Inactive') + '</span></td>' +
@@ -147,7 +147,9 @@
       '<h3>Contact and farm</h3>' +
       '<div class="mf-kv">' +
         kv('Email', f.email) + kv('Phone', f.phone) +
-        kv('Municipality', f.municipality) + kv('Barangay', f.barangay) +
+        kv('Municipality', f.municipality || 'Not set') + kv('Barangay', f.barangay || 'Not set') +
+        (f.lat ? '<div><small>Farm location</small><b>' + f.lat.toFixed(4) + ', ' + f.lon.toFixed(4) + (f.locSource === 'gps' ? ' (GPS pin)' : ' (town centre)') +
+          '<br><a href="https://www.openstreetmap.org/?mlat=' + f.lat + '&mlon=' + f.lon + '#map=15/' + f.lat + '/' + f.lon + '" target="_blank" rel="noopener" style="font-weight:600;color:#1a9d5c">View on map &rarr;</a></b></div>' : '') +
         kv('Farm size', num(f.farm_size) + ' ha') + kv('Member since', fmt(f.joined)) +
         kv('Last active', ago(f.last_active)) + kv('Account', f.status === 'active' ? 'Active' : 'Inactive') +
       '</div>';

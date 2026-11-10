@@ -17,6 +17,48 @@ import { DEFAULT_MARKETS, SAMPLE_FARMERS, SAMPLE_MY_CROPS, SAMPLE_MY_HARVESTS } 
 
 export { auth, database };
 
+// Shared styles (buttons, dialogs, form fields) are injected here, so no extra CSS file has to be copied.
+const AG_CSS = `/* assets/css/agri-ui.css
+   Shared pieces used by pages that read/write Firebase: buttons, dialog, form fields, empty state, toast.
+   Every class is prefixed ag- so nothing clashes with dashboard.css or the page styles. */
+.ag-btn { font: inherit; font-size: .86rem; font-weight: 700; cursor: pointer; padding: 9px 16px; border-radius: 999px; border: 1px solid #1a9d5c; background: #1a9d5c; color: #fff; transition: background .15s, box-shadow .15s; }
+.ag-btn:hover { background: #148a4f; }
+.ag-btn:focus-visible, .ag-ghost:focus-visible, .ag-x:focus-visible { outline: 3px solid rgba(26,157,92,.35); outline-offset: 2px; }
+.ag-btn[disabled] { opacity: .6; cursor: default; }
+.ag-ghost { font: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; padding: 7px 14px; border-radius: 999px; border: 1px solid #e1eee6; background: #fff; color: #35584a; transition: border-color .15s, color .15s; }
+.ag-ghost:hover { border-color: #1a9d5c; color: #0c4a30; }
+.ag-ghost.danger { color: #b13a2f; }
+.ag-ghost.danger:hover { border-color: #d6453d; color: #b13a2f; }
+.ag-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+.ag-empty { padding: 44px 24px; text-align: center; color: #6b8a7a; background: #fff; border: 1px dashed #cfe3d6; border-radius: 20px; }
+.ag-empty b { display: block; color: #0c4a30; font-size: 1.05rem; margin-bottom: 6px; }
+.ag-empty p { margin: 0 auto 16px; max-width: 420px; line-height: 1.5; }
+.ag-empty .ag-actions { justify-content: center; }
+.ag-loading { padding: 32px; text-align: center; color: #6b8a7a; }
+
+dialog.ag-dlg { border: 0; border-radius: 20px; padding: 0; width: min(480px, calc(100vw - 32px)); color: #12382a; font-family: inherit; box-shadow: 0 24px 60px rgba(12,74,48,.28); }
+dialog.ag-dlg::backdrop { background: rgba(12,40,28,.45); }
+.ag-dlg form { padding: 24px; }
+.ag-dlg h2 { margin: 0 0 4px; font-size: 1.2rem; color: #0c4a30; }
+.ag-dlg .ag-sub { margin: 0 0 18px; color: #6b8a7a; font-size: .88rem; }
+.ag-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ag-field { display: block; margin-bottom: 12px; }
+.ag-field span { display: block; margin-bottom: 5px; font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #6b8a7a; }
+.ag-field input, .ag-field select { width: 100%; font: inherit; font-size: .95rem; padding: 10px 12px; border-radius: 12px; border: 1px solid #d3e4d9; background: #fff; color: #12382a; }
+.ag-field input:focus, .ag-field select:focus { outline: 3px solid rgba(26,157,92,.25); border-color: #1a9d5c; }
+.ag-err { min-height: 1.2em; margin: 0 0 8px; color: #b13a2f; font-size: .86rem; font-weight: 600; }
+.ag-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+
+.ag-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 99; background: #0c4a30; color: #fff; padding: 11px 20px; border-radius: 999px; font-size: .9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+@media (max-width: 480px) { .ag-grid2 { grid-template-columns: 1fr; } }
+`;
+if (typeof document !== "undefined" && !document.getElementById("ag-ui-css")) {
+  const st = document.createElement("style");
+  st.id = "ag-ui-css"; st.textContent = AG_CSS;
+  document.head.appendChild(st);
+}
+
 /* ------------------------------------------------------------------ small helpers */
 export const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 export const num = (n) => String(Math.round(Number(n) * 10) / 10);
@@ -87,19 +129,26 @@ async function val(path) { const s = await get(R(path)); return s.exists() ? s.v
 export const toList = (obj) => (obj ? Object.entries(obj).map(([id, v]) => ({ ...v, id })) : []);
 
 /* ------------------------------------------------------------------ profile + session */
-export async function getProfile(uid) { return val("users/" + uid); }
+// Profiles written by the register page use fullName, role "user" and createdAt. This gives every page one shape.
+export function normUser(u) {
+  if (!u) return u;
+  let joined = u.joined;
+  if (!joined && Number(u.createdAt)) joined = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Manila" }).format(new Date(Number(u.createdAt)));
+  return { ...u, name: u.name || u.fullName || (u.email || "").split("@")[0] || "Farmer", status: u.status === "inactive" ? "inactive" : "active", joined: joined || todayISO() };
+}
+export async function getProfile(uid) { return normUser(await val("users/" + uid)); }
 
 export async function ensureProfile(user, extra) {
   let p = await getProfile(user.uid);
   if (!p) {
     p = Object.assign({
       name: user.displayName || (user.email || "").split("@")[0] || "Farmer",
-      email: user.email || "", phone: "", municipality: "Bay", barangay: "", farm_size: 0,
-      role: "farmer", status: "active", joined: todayISO(), lastActive: todayISO(),
+      email: user.email || "", phone: "", municipality: "", barangay: "", farm_size: 0,
+      role: "user", status: "active", joined: todayISO(), lastActive: todayISO(),
     }, extra || {});
     await set(R("users/" + user.uid), p);
   }
-  return p;
+  return normUser(p);
 }
 
 export function homeFor(profile) { return profile && profile.role === "admin" ? "../admin/dashboard.php" : "../user/dashboard.php"; }
@@ -112,19 +161,35 @@ export function requireUser(opts) {
     onAuthStateChanged(auth, async (user) => {
       if (!user) { location.href = "../index.html"; return; }
       try {
-        const profile = await ensureProfile(user);
+        const profile = await Promise.race([
+          ensureProfile(user),
+          new Promise((_, rej) => setTimeout(() => rej(new Error("Firebase did not answer within 15 seconds. Check the databaseURL in firebase.js and your connection.")), 15000)),
+        ]);
         if (profile.status === "inactive") { await signOut(auth); location.href = "../index.html?deactivated=1"; return; }
         if (role && profile.role !== role) { location.href = homeFor(profile); return; }
         update(R("users/" + user.uid), { lastActive: todayISO() }).catch(() => {});
         const w = document.getElementById("welcome");
         if (w) w.textContent = "Welcome, " + (profile.name || user.displayName || user.email) + "!";
+        if (profile.role !== "admin") {
+          // The dashboard weather box reads the saved location as the page loads, so reload once if it just changed
+          if (syncFarmLocation(profile) && document.getElementById("dashTemp")) { location.reload(); return; }
+          showLocationBar(user.uid, profile);
+          if (!hasLocation(profile)) setTimeout(() => openLocationDialog(user.uid, profile, (p) => showLocationBar(user.uid, p)), 400);
+        }
         resolve({ user, profile, uid: user.uid });
       } catch (err) {
         console.error(err);
-        showError("Could not load your data from Firebase. " + (err && err.code === "PERMISSION_DENIED" ? "Check that the database rules were published." : "Check your connection and reload."));
+        showError(explain(err, "Could not load your data from Firebase."));
       }
     });
   });
+}
+
+// Turns a Firebase error into a sentence that says what is actually wrong.
+export function explain(e, what) {
+  const raw = ((e && (e.code || "")) + " " + ((e && e.message) || "")).trim();
+  if (/permission/i.test(raw)) return what + " Firebase denied access: publish database.rules.json under Realtime Database > Rules, then reload. (" + raw + ")";
+  return what + " " + (raw || "Unknown error") + " (see the browser console for details)";
 }
 
 export function showError(text) {
@@ -137,6 +202,97 @@ export function showError(text) {
     main.insertBefore(box, main.firstChild);
   }
   box.textContent = text;
+}
+
+
+/* ------------------------------------------------------------------ farm location */
+// Town centres (approximate). A farmer can refine this with their device location.
+export const TOWN_COORDS = {"Alaminos": [14.0639, 121.2461], "Bay": [14.1833, 121.2833], "Biñan": [14.3333, 121.0833], "Cabuyao": [14.2724, 121.1251], "Calamba": [14.2117, 121.1653], "Calauan": [14.145, 121.3171], "Cavinti": [14.2433, 121.5096], "Famy": [14.4386, 121.4492], "Kalayaan": [14.3253, 121.4608], "Liliw": [14.1286, 121.4339], "Los Baños": [14.1699, 121.2415], "Luisiana": [14.1839, 121.5103], "Lumban": [14.2989, 121.4631], "Mabitac": [14.4297, 121.4261], "Magdalena": [14.2, 121.4333], "Majayjay": [14.1469, 121.4736], "Nagcarlan": [14.1364, 121.4153], "Paete": [14.3647, 121.4836], "Pagsanjan": [14.2736, 121.4547], "Pakil": [14.3786, 121.4781], "Pangil": [14.4042, 121.465], "Pila": [14.2333, 121.3667], "Rizal": [14.1111, 121.3939], "San Pablo City": [14.0689, 121.3256], "San Pedro": [14.3595, 121.0473], "Santa Cruz": [14.2781, 121.4161], "Santa Maria": [14.4678, 121.4283], "Santa Rosa": [14.3122, 121.1114], "Siniloan": [14.4169, 121.4486], "Victoria": [14.2242, 121.3306]};
+
+// The farm location is set once and then stays fixed. Every page reads it from here.
+export function farmLocation(p) {
+  if (!hasLocation(p)) return null;
+  const c = TOWN_COORDS[p.municipality] || [14.1833, 121.2833];
+  return { name: p.municipality + ", Laguna, Philippines", lat: Number(p.lat) || c[0], lon: Number(p.lon) || c[1] };
+}
+// Returns true when the saved weather location had to be changed to match the farm.
+export function syncFarmLocation(p) {
+  const loc = farmLocation(p);
+  if (!loc) return false;
+  const next = JSON.stringify(loc);
+  try {
+    if (localStorage.getItem("agritrack.location") === next) return false;
+    localStorage.setItem("agritrack.location", next);
+    return true;
+  } catch (e) { return false; }
+}
+
+export const hasLocation = (p) => !!(p && p.municipality && p.barangay);
+export const locationText = (p) => (p && p.municipality ? (p.barangay ? "Brgy. " + p.barangay + ", " : "") + p.municipality + ", Laguna" : "Not set");
+
+// Dialog where a farmer sets where their farm is. Saved to users/{uid}; the weather page uses it too.
+export function openLocationDialog(uid, profile, onSaved) {
+  let dlg = document.getElementById("locDlg");
+  if (dlg) dlg.remove();
+  dlg = document.createElement("dialog");
+  dlg.id = "locDlg"; dlg.className = "ag-dlg";
+  const opts = Object.keys(TOWN_COORDS).map((t) => '<option value="' + esc(t) + '"' + (profile.municipality === t ? " selected" : "") + ">" + esc(t) + "</option>").join("");
+  dlg.innerHTML = '<form method="dialog" novalidate><h2>Where is your farm?</h2>' +
+    '<p class="ag-sub">Set once. Admins see it on your profile, and your weather, markets and recommendations all use it.</p>' +
+    '<label class="ag-field"><span>Municipality / city (Laguna)</span><select name="town"><option value="">Choose&hellip;</option>' + opts + "</select></label>" +
+    '<label class="ag-field"><span>Barangay</span><input name="brgy" autocomplete="off" value="' + esc(profile.barangay || "") + '" placeholder="e.g. San Antonio"></label>' +
+    '<div class="ag-actions" style="margin:0 0 10px"><button type="button" class="ag-ghost" id="locGps">Use my current location</button></div>' +
+    '<p class="ag-sub" id="locInfo" style="margin:0 0 8px">' + (profile.lat ? "Pin saved: " + Number(profile.lat).toFixed(4) + ", " + Number(profile.lon).toFixed(4) : "Optional: adds an exact pin to your profile.") + "</p>" +
+    '<p class="ag-err" id="locErr" role="alert"></p>' +
+    '<div class="ag-foot"><button type="button" class="ag-ghost" data-close>Later</button><button type="submit" class="ag-btn">Save location</button></div></form>';
+  document.body.appendChild(dlg);
+  const f = dlg.querySelector("form");
+  let pin = profile.lat ? { lat: Number(profile.lat), lon: Number(profile.lon), src: profile.locationSource || "town" } : null;
+  dlg.querySelector("[data-close]").addEventListener("click", () => dlg.close());
+  f.town.addEventListener("change", () => { if (!pin || pin.src === "town") pin = null; });
+  dlg.querySelector("#locGps").addEventListener("click", () => {
+    const info = dlg.querySelector("#locInfo");
+    if (!navigator.geolocation) { info.textContent = "This browser cannot share its location."; return; }
+    info.textContent = "Asking your device for its location\u2026";
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { pin = { lat: Math.round(pos.coords.latitude * 1e5) / 1e5, lon: Math.round(pos.coords.longitude * 1e5) / 1e5, src: "gps" }; info.textContent = "Pin set: " + pin.lat.toFixed(4) + ", " + pin.lon.toFixed(4) + ". Pick your municipality and barangay too."; },
+      () => { info.textContent = "Location was blocked. Choose your town and barangay instead."; },
+      { enableHighAccuracy: true, timeout: 10000 });
+  });
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const town = f.town.value, brgy = f.brgy.value.trim(), err = dlg.querySelector("#locErr");
+    if (!town) return (err.textContent = "Choose your municipality or city.");
+    if (!brgy) return (err.textContent = "Enter your barangay.");
+    const c = TOWN_COORDS[town];
+    const at = pin || { lat: c[0], lon: c[1], src: "town" };
+    const patch = { municipality: town, barangay: brgy, lat: at.lat, lon: at.lon, locationSource: at.src };
+    try {
+      await update(R("users/" + uid), patch);
+      try { localStorage.setItem("agritrack.location", JSON.stringify({ name: town + ", Laguna, Philippines", lat: at.lat, lon: at.lon })); } catch (x) {}
+      dlg.close(); toast("Farm location saved");
+      if (document.getElementById("dashTemp")) setTimeout(() => location.reload(), 600);
+      if (onSaved) onSaved(Object.assign({}, profile, patch));
+    } catch (ex) { err.textContent = explain(ex, "Could not save."); }
+  });
+  dlg.showModal();
+}
+
+// A slim bar at the top of each farmer page showing the saved location, with a Change button.
+function showLocationBar(uid, profile) {
+  let bar = document.getElementById("locBar");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "locBar";
+    bar.style.cssText = "display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;font:600 .86rem 'Plus Jakarta Sans',sans-serif;color:#35584a";
+    const main = document.querySelector("main") || document.body;
+    main.insertBefore(bar, main.firstChild);
+  }
+  bar.innerHTML = '<span aria-hidden="true">\u{1F4CD}</span><span>Farm location: <b>' + esc(locationText(profile)) + '</b></span>' + (hasLocation(profile)
+    ? '<span style="font-weight:500;color:#6b8a7a">Fixed for your account. Ask an administrator if it needs to change.</span>'
+    : '<button type="button" class="ag-ghost" style="padding:4px 12px">Set location</button>');
+  const btn = bar.querySelector("button");
+  if (btn) btn.addEventListener("click", () => openLocationDialog(uid, profile, (p) => showLocationBar(uid, p)));
 }
 
 /* ------------------------------------------------------------------ farmer data */
@@ -209,7 +365,7 @@ export async function seedMarkets() {
 }
 
 /* ------------------------------------------------------------------ admin helpers */
-export async function listAllUsers() { return toList(await val("users")); }
+export async function listAllUsers() { return toList(await val("users")).map(normUser); }
 export async function listAll(node) { return (await val(node)) || {}; } // object keyed by uid
 export async function updateUser(uid, patch) { await update(R("users/" + uid), patch); }
 
@@ -224,8 +380,10 @@ export async function seedSample() {
     const uid = "sample-f" + String(i + 1).padStart(3, "0");
     multi["users/" + uid] = {
       name: f.name, email: f.email, phone: f.phone, municipality: f.municipality, barangay: f.barangay,
-      farm_size: f.farm_size, role: "farmer", status: f.status, joined: at(f.joined), lastActive: at(f.lastActive), sample: true,
+      farm_size: f.farm_size, role: "user", status: f.status, joined: at(f.joined), lastActive: at(f.lastActive), sample: true,
     };
+    const tc = TOWN_COORDS[f.municipality];
+    if (tc) Object.assign(multi["users/" + uid], { lat: tc[0], lon: tc[1], locationSource: "town" });
     f.crops.forEach((c, j) => {
       const o = { name: c.name, field: c.field, area: c.area, planted: at(c.planted), harvest: at(c.harvest), moisture: c.moisture };
       const d = CROP_DEFAULTS[c.name] || {};

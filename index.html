@@ -264,22 +264,26 @@ loginForm.addEventListener("submit", async function (event) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // STEP 2: GET USER ROLE FROM DATABASE
-        const roleReference = ref(database, "users/" + user.uid + "/role");
-        const roleSnapshot = await get(roleReference);
+        // STEP 2: GET THE USER PROFILE (role and account status) FROM THE DATABASE
+        const profileSnapshot = await get(ref(database, "users/" + user.uid));
 
-        // STEP 3: CHECK USER ROLE
-        if (!roleSnapshot.exists()) {
+        // STEP 3: CHECK ROLE AND STATUS
+        if (!profileSnapshot.exists() || !profileSnapshot.val().role) {
             throw new Error("Your account has no assigned role. Please contact the administrator.");
         }
 
-        const role = roleSnapshot.val();
+        const profile = profileSnapshot.val();
+        const role = profile.role;
+
+        if (profile.status === "inactive") {
+            throw new Error("This account has been deactivated. Please contact the administrator.");
+        }
 
         // STEP 4: REDIRECT USER
         if (role === "admin") {
             window.location.href = "admin/dashboard.php";
         }
-        else if (role === "user") {
+        else if (role === "user" || role === "farmer") {
             window.location.href = "user/dashboard.php";
         }
         else {
@@ -352,6 +356,11 @@ forgotPassword.addEventListener("click", async function (event) {
     }
 
 });
+
+// MESSAGE LEFT BY A REDIRECT (an admin deactivated this account while it was signed in)
+if (new URLSearchParams(window.location.search).get("deactivated") === "1") {
+    showMessage("This account has been deactivated. Please contact the administrator.", "danger");
+}
 
 console.log("AgriTrack Login Page Loaded.");
 
