@@ -50,14 +50,33 @@ requireUser({ role: "admin" }).then(async () => {
     const tons = harvests.reduce((s, h) => s + (Number(h.yield_t) || 0), 0);
     const revenue = harvests.reduce((s, h) => s + (Number(h.yield_t) || 0) * 1000 * (Number(h.price) || 0), 0);
     const warn = live.filter((c) => c.status === "warn").length;
+
+    // Calculate Projected Revenue from live standing crops
+    const projectedRevenue = live.reduce((sum, c) => {
+      const estYieldTons = Number(c.expected_yield || c.yield_t || 0);
+      const estPricePerKg = Number(c.price || c.expected_price || 45); // default market rate if unassigned
+      return sum + (estYieldTons * 1000 * estPricePerKg);
+    }, 0);
+
     const tiles = [
       ["Farmers", farmers.length, active + " active, " + (farmers.length - active) + " inactive", ""],
       ["Crops growing", live.length, num(area) + " ha planted", ""],
-      ["Total harvested", num(tons) + " t", peso(revenue) + " estimated sales", ""],
+      ["Total harvested", num(tons) + " t", peso(revenue) + " sales recorded", ""],
       ["Need attention", warn, warn ? "Crops with dry soil" : "Everything looks fine", warn ? "warn" : ""],
     ];
-    $("stats").innerHTML = tiles.map((t) =>
+
+    // Preserve existing JS rendering for the first 4 stats and update the Projected Revenue element
+    $("stats").querySelectorAll('.ad-stat:not(.featured)').forEach(el => el.remove());
+    
+    const statsHTML = tiles.map((t) =>
       '<div class="ad-stat ' + t[3] + '"><small>' + esc(t[0]) + "</small><b>" + esc(t[1]) + "</b><span>" + esc(t[2]) + "</span></div>").join("");
+    
+    $("stats").insertAdjacentHTML('afterbegin', statsHTML);
+
+    const revenueElem = $("totalRevenue");
+    if (revenueElem) {
+      revenueElem.textContent = projectedRevenue > 0 ? peso(projectedRevenue) : "₱0";
+    }
 
     // ---- harvested per month (last 6 months)
     const [ty, tm] = todayISO().split("-").map(Number);

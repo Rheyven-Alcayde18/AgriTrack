@@ -133,7 +133,7 @@ $current = 'crop-monitoring.php';
     .cm-empty { display: none; padding: 40px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: 20px; }
 
     /* Dialogs */
-    .cm-dlg { border: 0; border-radius: 20px; padding: 0; width: min(520px, calc(100vw - 32px)); color: var(--ink); font-family: inherit; box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+    .cm-dlg { --ink: #12382a; --dark: #0c4a30; --green: #1a9d5c; --line: #e1eee6; --muted: #6b8a7a; border: 0; border-radius: 20px; padding: 0; width: min(520px, calc(100vw - 32px)); color: var(--ink); font-family: inherit; box-shadow: 0 24px 60px rgba(0,0,0,.25); }
     .cm-dlg::backdrop { background: rgba(8, 40, 26, .55); }
     .cm-dlg form { padding: 24px; display: grid; gap: 14px; }
     .cm-dlg h3 { margin: 0; font-size: 1.15rem; color: var(--dark); }

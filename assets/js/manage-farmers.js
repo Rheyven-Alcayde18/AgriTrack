@@ -1,14 +1,58 @@
 // assets/js/manage-farmers.js
 // Admin > Manage farmers, connected to Firebase Realtime Database.
-// Reads users, crops, harvests, activities and savedMarkets (admin-only by the database rules),
-// then starts farmers.js. Edits and activate/deactivate are written to users/{uid}.
-// Loaded by admin/manage-farmers.php.
 import {
   requireUser, listAllUsers, listAll, loadMarkets, updateUser, seedSample, clearSample,
   derive, toList, bootClassic, toast, showError
 } from "./db.js";
 
 const $ = (id) => document.getElementById(id);
+
+const renderFarmersTable = (farmers) => {
+  const tbody = $("farmersTableBody");
+  if (!tbody) return;
+
+  if (!farmers.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">No registered farmers found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = farmers.map((f) => `
+    <tr>
+      <td>
+        <b>${f.name}</b><br>
+        <small style="color:#6b8a7a;">${f.email}</small>
+      </td>
+      <td>${f.municipality || 'Not set'}</td>
+      <td>${f.farm_size ? f.farm_size + ' ha' : 'N/A'}</td>
+      <td>${f.crops.length} crop(s)</td>
+      <td>
+        <span class="ad-pill ${f.status}">${f.status === 'inactive' ? 'Inactive' : 'Active'}</span>
+      </td>
+      <td>
+        <button class="ad-btn ad-btn-outline toggle-status-btn" data-id="${f.id}" data-status="${f.status}">
+          ${f.status === 'inactive' ? 'Activate' : 'Deactivate'}
+        </button>
+      </td>
+    </tr>
+  `).join('');
+
+  // Attach event listeners for status toggle buttons
+  document.querySelectorAll('.toggle-status-btn').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const uid = e.target.getAttribute('data-id');
+      const currentStatus = e.target.getAttribute('data-status');
+      const newStatus = currentStatus === 'inactive' ? 'active' : 'inactive';
+
+      try {
+        await updateUser(uid, { status: newStatus });
+        toast(`Farmer status updated to ${newStatus}`);
+        setTimeout(() => location.reload(), 500);
+      } catch (err) {
+        showError("Failed to update status: " + err.message);
+      }
+    });
+  });
+};
 
 requireUser({ role: "admin" }).then(async () => {
   try {
@@ -29,6 +73,11 @@ requireUser({ role: "admin" }).then(async () => {
     markets.forEach((m) => { marketInfo[m.id] = { name: m.name, town: m.town, type: m.type }; });
 
     window.AGRITRACK_ON_EDIT = (id, patch) => updateUser(id, patch);
+    
+    // Render the custom table UI
+    renderFarmersTable(farmers);
+
+    // Boot classic helper if present
     bootClassic({ farmers, markets: marketInfo }, "../assets/js/farmers.js", "AGRITRACK_FARMERS");
   } catch (e) {
     console.error(e);
@@ -41,6 +90,7 @@ $("loadSample").addEventListener("click", async (e) => {
   try { const n = await seedSample(); toast(n + " sample farmers added"); setTimeout(() => location.reload(), 700); }
   catch (ex) { showError("Could not add sample data. " + (ex.code || ex.message)); e.target.disabled = false; }
 });
+
 $("clearSample").addEventListener("click", async (e) => {
   if (!confirm("Remove all sample farmers and their crops, harvests and activities? Real farmers are not touched.")) return;
   e.target.disabled = true;
