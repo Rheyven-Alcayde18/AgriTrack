@@ -246,6 +246,18 @@ dialog::backdrop { background: rgba(8, 30, 20, .5); backdrop-filter: blur(2px); 
 .croplist span { color: var(--ink-600); text-align: right; }
 .dlg-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
 
+.field { display: grid; gap: 6px; margin-top: 16px; }
+.field label { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-600); }
+.input {
+    width: 100%; padding: 11px 14px;
+    font: 500 14.5px var(--font-body); color: var(--ink-900);
+    border: 1.5px solid var(--line); border-radius: 12px; background: #fff;
+    transition: border-color .2s, box-shadow .2s;
+}
+.input:focus { outline: none; border-color: var(--leaf-600); box-shadow: 0 0 0 4px rgba(47, 165, 95, .16); }
+select.input { cursor: pointer; }
+.dlg .hint { margin-top: 14px; font-size: 13px; line-height: 1.5; color: var(--ink-600); }
+
 .toast {
     position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 99;
     padding: 11px 20px; border-radius: 999px; max-width: calc(100vw - 32px);

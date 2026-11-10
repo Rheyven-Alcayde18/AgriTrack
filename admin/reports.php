@@ -12,10 +12,50 @@ $topActions = '<button type="button" class="btn" id="refreshBtn"><i class="ph-bo
               '<button type="button" class="btn primary" id="downloadAll"><i class="ph-bold ph-file-xls" aria-hidden="true"></i> Download all (Excel)</button>';
 
 // SheetJS builds the .xlsx files. It loads from a CDN, so Excel downloads need an internet connection (CSV does not).
-$extraHead = '<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>';
+$extraHead = <<<'HTML'
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+    /* Report preview table: same look as the Manage farmers table. Scoped to .rp so it only affects this page. */
+    .rp .table-wrap { overflow-x: auto; }
+    .rp table { width: 100%; border-collapse: collapse; table-layout: auto; }
+    .rp th {
+        padding: 12px 10px; text-align: left; white-space: nowrap;
+        font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #56655b;
+        background: #eef7f1; border-bottom: 1px solid #e1eee6;
+    }
+    .rp td { padding: 12px 10px; font-size: .88rem; border-bottom: 1px solid #eef5f0; vertical-align: middle; color: #1c2a22; white-space: nowrap; }
+    .rp td.right, .rp th.right { text-align: right; white-space: nowrap; }
+    .rp td:first-child { font-weight: 700; color: #08301d; }
+    .rp tbody tr:last-child td { border-bottom: 0; }
+    .rp tbody tr:hover { background: #f8fcf9; }
+    .rp .fld-search { flex: 1 1 240px; }
+    .rp .fld-search input {
+        width: 100%; font: inherit; padding: 10px 14px; color: #1c2a22; background: #fff;
+        border: 1.5px solid #e1eee6; border-radius: 12px; transition: border-color .2s, box-shadow .2s;
+    }
+    .rp .fld-search input:focus { outline: 0; border-color: #1a8348; box-shadow: 0 0 0 4px rgba(47, 165, 95, .16); }
+    .rp .card { background: #fff; border: 1px solid #e1eee6; border-radius: 18px; overflow: hidden; }
+    .rp-person { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #08301d; }
+    .rp-avatar {
+        flex: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%;
+        font-size: .76rem; font-weight: 800; color: #fff; background: linear-gradient(145deg, #34b974, #0c4a30);
+    }
+    .rp-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+    .rp-pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .rp-pill.ok { color: #1a8348; background: #e6f5d6; }
+    .rp-pill.off { color: #b8402b; background: #fdecea; }
+    .rp-pill.warn { color: #9a6a00; background: #fdf5e0; }
+    .rp td:first-child { font-weight: 400; }
+    .rp .state { padding: 50px 24px; text-align: center; color: #56655b; }
+    .rp .state b { display: block; margin-bottom: 4px; font-size: 1rem; color: #08301d; }
+    .rp .foot { padding: 12px 16px; font-size: .82rem; color: #56655b; background: #fafdfb; border-top: 1px solid #e1eee6; }
+</style>
+HTML;
 
 require __DIR__ . '/includes/header.php';
 ?>
+
+        <div class="rp">
 
         <!-- OVERALL NUMBERS -->
         <section class="stats" aria-label="Summary">
@@ -36,6 +76,9 @@ require __DIR__ . '/includes/header.php';
 
         <!-- FILTERS -->
         <div class="toolbar">
+            <label class="fld fld-search">Search
+                <input type="search" id="searchInput" placeholder="Search this report" aria-label="Search this report" autocomplete="off">
+            </label>
             <label class="fld">Municipality
                 <select id="townFilter" aria-label="Filter by municipality">
                     <option value="all">All municipalities</option>
@@ -73,6 +116,8 @@ require __DIR__ . '/includes/header.php';
             <div class="foot" id="previewFoot" aria-live="polite"></div>
         </div>
 
+        </div>
+
 <?php require __DIR__ . '/includes/footer.php'; ?>
 
 <script type="module">
@@ -102,10 +147,19 @@ require __DIR__ . '/includes/header.php';
     }
 
 
+    // Farm size: the number on the farmer's profile if there is one, otherwise the total area of their crops.
+    // (The register page does not ask for a farm size, so most profiles have none.)
+    function sizeOf(x) {
+        if (Number(x.farm_size) > 0) return Number(x.farm_size);
+        if (Number(x.cropArea) > 0) return Number(x.cropArea);
+        return (x.crops || []).reduce((n, c) => n + (Number(c.area) || 0), 0);
+    }
+
+
     // ---------- the four reports ----------
     // Each builder returns { title, sheet, file, dateNote, headers, rows }.
     // Rows hold real numbers (not text) so Excel can sum and sort them.
-    function build(kind) {
+    function buildReport(kind) {
         const f = filters();
         const okTown = (m) => f.town === "all" || m === f.town;
 
@@ -113,12 +167,12 @@ require __DIR__ . '/includes/header.php';
             return {
                 title: "Farmers report", sheet: "Farmers", file: "farmers",
                 dateNote: "Date range applies to the day the farmer joined.",
-                headers: ["Name", "Email", "Phone", "Municipality", "Barangay", "Farm size (ha)", "Status", "Joined", "Last active", "Registered crops"],
+                headers: ["Name", "Email", "Municipality", "Barangay", "Farm size (ha)", "Status", "Joined", "Last active", "Registered crops"],
                 rows: data.farmers
                     .filter((x) => okTown(x.municipality) && inRange(x.joined, f.from, f.to))
                     .map((x) => [
-                        x.name, x.email || "", x.phone || "", x.municipality || "", x.barangay || "",
-                        r2(x.farm_size), x.status === "active" ? "Active" : "Deactivated",
+                        x.name, x.email || "", x.municipality || "", x.barangay || "",
+                        r2(sizeOf(x)), x.status === "active" ? "Active" : "Deactivated",
                         x.joined || "", x.lastActive || "", x.crops.length
                     ])
             };
@@ -179,10 +233,24 @@ require __DIR__ . '/includes/header.php';
     }
 
 
+    // The search box keeps only rows where any cell contains the typed text (so downloads match what you see).
+    function build(kind) {
+        const rep = buildReport(kind);
+        const q = $("searchInput").value.trim().toLowerCase();
+        if (q) rep.rows = rep.rows.filter((r) => r.some((v) => String(v === null || v === undefined ? "" : v).toLowerCase().indexOf(q) >= 0));
+        return rep;
+    }
+
+
     // ---------- preview ----------
     function show(v) {
         if (typeof v === "number") return v.toLocaleString("en-US", { maximumFractionDigits: 2 });
         return v === null || v === undefined || v === "" ? "-" : String(v);
+    }
+
+    function initials(name) {
+        const parts = String(name || "?").trim().split(/\s+/).slice(0, 2);
+        return parts.map((p) => p.charAt(0).toUpperCase()).join("") || "?";
     }
 
     function renderPreview() {
@@ -207,8 +275,21 @@ require __DIR__ . '/includes/header.php';
             return;
         }
 
+        // Preview only: the first column of the farmer, crop and harvest reports gets an avatar,
+        // and Status columns become coloured pills. The CSV and Excel downloads stay plain values.
+        const hasPerson = rep.headers[0] === "Name" || rep.headers[0] === "Farmer";
+        const statusCol = rep.headers.indexOf("Status");
+        const pillClass = (v) => /^(active|on track)$/i.test(v) ? "ok" : /deactivated/i.test(v) ? "off" : "warn";
+
         $("previewBody").innerHTML = rep.rows.slice(0, PREVIEW_ROWS).map((r) =>
-            "<tr>" + r.map((v) => '<td class="' + (typeof v === "number" ? "right" : "") + '">' + esc(show(v)) + "</td>").join("") + "</tr>"
+            "<tr>" + r.map((v, i) => {
+                const text = esc(show(v));
+                if (i === 0 && hasPerson) {
+                    return '<td><div class="rp-person"><span class="rp-avatar" aria-hidden="true">' + esc(initials(v)) + "</span>" + text + "</div></td>";
+                }
+                if (i === statusCol && v) return '<td><span class="rp-pill ' + pillClass(String(v)) + '">' + text + "</span></td>";
+                return '<td class="' + (typeof v === "number" ? "right" : "") + '">' + text + "</td>";
+            }).join("") + "</tr>"
         ).join("");
 
         $("previewFoot").textContent = rep.rows.length > PREVIEW_ROWS
@@ -336,9 +417,10 @@ require __DIR__ . '/includes/header.php';
         renderPreview();
     });
 
-    ["townFilter", "dateFrom", "dateTo"].forEach((id) => $(id).addEventListener("input", renderPreview));
+    ["searchInput", "townFilter", "dateFrom", "dateTo"].forEach((id) => $(id).addEventListener("input", renderPreview));
 
     $("clearFilters").addEventListener("click", () => {
+        $("searchInput").value = "";
         $("townFilter").value = "all";
         $("dateFrom").value = "";
         $("dateTo").value = "";
@@ -349,7 +431,7 @@ require __DIR__ . '/includes/header.php';
     $("downloadXlsx").addEventListener("click", downloadXlsx);
     $("downloadAll").addEventListener("click", downloadAll);
     $("refreshBtn").addEventListener("click", load);
-    $("logoutBtn").addEventListener("click", signOutAndGo);
+    if ($("logoutBtn")) $("logoutBtn").addEventListener("click", signOutAndGo);
 
     // only admins get past this line
     requireUser({ role: "admin" }).then(load);
