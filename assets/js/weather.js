@@ -58,7 +58,7 @@ const ICONS = {
 };
 const DROP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5C8 8 5.5 11.2 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 11.2 16 8 12 2.5Z"/></svg>';
 
-function icon(key, size) {
+export function icon(key, size) {
   const s = size ? ' width="' + size + '" height="' + size + '"' : '';
   return '<svg class="wx-ic ' + key + '"' + s + ' viewBox="0 0 24 24" aria-hidden="true">' + ICONS[key] + '</svg>';
 }
@@ -120,9 +120,11 @@ function render(loc, data) {
   $('mDaylightSub').textContent = 'Sunrise · sunset ' + time(d.sunset[0]);
 
   const a = advice(d, c);
-  $('advice').dataset.level = a.level;
-  $('tipTitle').textContent = a.title;
-  $('tip').textContent = a.text;
+  if ($('advice')) {
+    $('advice').dataset.level = a.level;
+    $('tipTitle').textContent = a.title;
+    $('tip').textContent = a.text;
+  }
   $('updated').textContent = 'Last updated ' + time(c.time) + ', local time at this place.';
 
   // Shared scale so the range bars are comparable across the week
@@ -162,7 +164,8 @@ function render(loc, data) {
 function initWeatherPage() {
   const root = $('wxRoot');
   const statusEl = $('status');
-  let loc = getLocation();
+  // Admins have no farm: they start from the default area, never from a farmer's saved place
+  let loc = FARM || (IS_ADMIN ? { ...DEFAULT } : getLocation());
 
   async function load() {
     root.classList.add('is-loading');
@@ -196,8 +199,18 @@ function initWeatherPage() {
     }
   });
 
-  $('resetLoc').addEventListener('click', () => {
+  const resetBtn = $('resetLoc');
+  if (resetBtn) resetBtn.addEventListener('click', () => {
     loc = FARM || { ...DEFAULT };
+    load();
+  });
+
+  // Other modules (the admin "farmer areas" panel) can ask this page to show a place
+  window.addEventListener('agritrack:show-place', (ev) => {
+    const p = ev.detail;
+    if (!p || !Number.isFinite(p.lat) || !Number.isFinite(p.lon)) return;
+    loc = { name: p.name, lat: p.lat, lon: p.lon };
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     load();
   });
 
@@ -206,9 +219,11 @@ function initWeatherPage() {
 
 // The weather page opens on the signed-in farmer's own farm location
 let FARM = null;
+let IS_ADMIN = false;
 if ($('searchForm')) {
   const session = await requireUser();
-  FARM = farmLocation(session.profile);
+  IS_ADMIN = session.profile && session.profile.role === 'admin';
+  FARM = IS_ADMIN ? null : farmLocation(session.profile);
   if (FARM) {
     saveLocation(FARM);
     // The page text says "Reset to Bay, Laguna". Show the farmer's own place instead.

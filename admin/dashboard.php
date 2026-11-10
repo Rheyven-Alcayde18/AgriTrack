@@ -1,60 +1,37 @@
 <?php
-$icons = [
-  'home'     => '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
-  'farmers'  => '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.6.2 4.5 2.2 4.5 5.3"/>',
-  'weather'  => '<path d="M17.5 19a4.5 4.5 0 1 0-1-8.9A6 6 0 0 0 4.7 12 3.5 3.5 0 0 0 6.5 19Z"/>',
-  'reports'  => '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
-  'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
-  'leaf'     => '<path d="M6 18c0-8 5-13 13-13 0 8-5 13-13 13Z"/><path d="M6 18 14 10"/>',
-];
-function ic($k) { global $icons; return '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">' . $icons[$k] . '</svg>'; }
-
-$nav = [
-  ['dashboard.php', 'Dashboard', 'home'],
-  ['manage-farmers.php', 'Manage farmers', 'farmers'],
-  ['weather-forecast.php', 'Weather forecast', 'weather'],
-  ['reports.php', 'Reports', 'reports'],
-  ['settings.php', 'Settings', 'settings'],
-];
-$current = 'dashboard.php';
+// admin/dashboard.php
 // All figures come from Firebase (see assets/js/admin-dashboard.js).
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgriTrack | Admin dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/dashboard.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <style>
-    /* Admin dashboard only. Every class is prefixed ad- so nothing clashes with dashboard.css */
+// Same sidebar, header and look as the other admin pages (admin/includes + assets/css/admin.css).
+
+$pageTitle = 'Admin dashboard';
+$active    = 'dashboard';
+$heading   = 'Admin dashboard';
+$subtitle  = 'An overview of every farmer, crop and harvest on AgriTrack.';
+
+$extraHead = <<<'HTML'
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+    /* Dashboard only. Every class is prefixed ad- so nothing clashes with admin.css.
+       The class names are the ones assets/js/admin-dashboard.js draws, so only the look changed. */
     .ad {
-      --ink: #12382a; --dark: #0c4a30; --green: #1a9d5c; --mint: #eef7f1;
-      --line: #e1eee6; --muted: #6b8a7a; --amber: #d99a00; --red: #d6453d; --blue: #3a86c8;
-      color: var(--ink); font-variant-numeric: tabular-nums;
+        --ink: #1c2a22; --dark: #08301d; --green: #1a8348; --mint: #e6f5d6;
+        --line: #dbe6d0; --muted: #56655b; --amber: #d99a00; --red: #d6453d; --blue: #3a86c8;
+        color: var(--ink); font-variant-numeric: tabular-nums;
     }
     .ad * { box-sizing: border-box; }
-    .ad-head { margin-bottom: 22px; }
-    .ad-head h1 { margin: 0 0 4px; }
-    .ad-head p { margin: 0; color: var(--muted); }
-    .ad-head .ad-welcome:empty { display: none; }
-    .ad-sample { display: none; margin-top: 12px; padding: 8px 14px; border-radius: 999px; background: #fdf6e0; color: #7a5a00; font-size: .82rem; font-weight: 600; width: fit-content; }
+    .ad-sample { display: none; margin: 0 0 18px; padding: 8px 14px; border-radius: 999px; background: #fdf6e0; color: #7a5a00; font-size: .82rem; font-weight: 600; width: fit-content; }
 
-    .ad-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 22px 24px; }
-    .ad-card h2 { margin: 0 0 2px; font-size: 1.05rem; color: var(--dark); }
+    .ad-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; box-shadow: 0 10px 24px -18px rgba(8, 48, 29, .3); }
+    .ad-card h2 { margin: 0 0 2px; font-family: var(--font-display); font-size: 17px; letter-spacing: -.2px; color: var(--dark); }
     .ad-card > p { margin: 0 0 16px; font-size: .84rem; color: var(--muted); }
     .ad-card .ad-link { float: right; font-size: .84rem; font-weight: 700; color: var(--green); text-decoration: none; }
     .ad-card .ad-link:hover { text-decoration: underline; }
 
     /* Stats */
-    .ad-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
-    .ad-stat { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
+    .ad-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+    .ad-stat { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; box-shadow: 0 10px 24px -18px rgba(8, 48, 29, .3); }
     .ad-stat small { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); }
-    .ad-stat b { display: block; margin: 8px 0 2px; font-size: 1.7rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
+    .ad-stat b { display: block; margin: 8px 0 2px; font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
     .ad-stat span { font-size: .82rem; color: var(--muted); }
     .ad-stat.warn b { color: var(--red); }
 
@@ -66,8 +43,8 @@ $current = 'dashboard.php';
     /* Monthly chart */
     .ad-chart { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; align-items: end; height: 190px; padding-top: 10px; }
     .ad-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
-    .ad-col i { display: block; width: 100%; max-width: 46px; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, #4cc088, #1a9d5c); min-height: 4px; }
-    .ad-col.zero i { background: #e4efe8; }
+    .ad-col i { display: block; width: 100%; max-width: 46px; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, #8bd63f, #1a8348); min-height: 4px; }
+    .ad-col.zero i { background: #e7f0dc; }
     .ad-col b { font-size: .8rem; color: var(--dark); }
     .ad-col small { font-size: .74rem; color: var(--muted); }
 
@@ -76,116 +53,106 @@ $current = 'dashboard.php';
     .ad-bar-top { display: flex; justify-content: space-between; gap: 10px; font-size: .86rem; margin-bottom: 5px; }
     .ad-bar-top b { color: var(--dark); }
     .ad-bar-top span { color: var(--muted); }
-    .ad-track { height: 8px; border-radius: 99px; background: #e4efe8; overflow: hidden; }
-    .ad-track i { display: block; height: 100%; border-radius: 99px; background: var(--green); }
+    .ad-track { height: 10px; border-radius: 99px; background: #e6f5d6; overflow: hidden; }
+    .ad-track i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #2fa55f, #8bd63f); }
     .ad-track.blue i { background: var(--blue); }
 
     /* Lists */
     .ad-list { display: grid; gap: 0; }
-    .ad-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+    .ad-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid #eef3e8; }
     .ad-row:first-child { border-top: 0; padding-top: 2px; }
     .ad-row b { display: block; font-size: .92rem; color: var(--dark); }
     .ad-row small { display: block; font-size: .8rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
     .ad-row > span { font-size: .78rem; color: var(--muted); white-space: nowrap; }
     .ad-pill { font-size: .74rem; font-weight: 700; padding: 4px 11px; border-radius: 999px; white-space: nowrap; }
-    .ad-pill.active, .ad-pill.ok { background: #e3f4ea; color: #15753f; }
-    .ad-pill.inactive, .ad-pill.done { background: #edf1ef; color: #5b756a; }
-    .ad-pill.soon { background: #fdf2d6; color: #9a6a00; }
-    .ad-pill.warn { background: #fde6e3; color: #b13a2f; }
+    .ad-pill.active, .ad-pill.ok { background: #e6f5d6; color: #12663a; }
+    .ad-pill.inactive, .ad-pill.done { background: #edf0ea; color: #56655b; }
+    .ad-pill.soon { background: #fdf1d8; color: #a8710d; }
+    .ad-pill.warn { background: #fdecea; color: #b8402b; }
     .ad-none { margin: 0; padding: 18px 0 6px; text-align: center; color: var(--muted); font-size: .9rem; }
 
     .ad-map { height: 360px; border-radius: 14px; border: 1px solid var(--line); z-index: 0; }
     .ad-pin b { color: var(--dark); }
-    .ad-empty { display: none; margin-bottom: 16px; padding: 36px 24px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: 20px; }
+    .ad-empty { display: none; margin-bottom: 16px; padding: 36px 24px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: 18px; }
     .ad-empty b { display: block; color: var(--dark); font-size: 1.1rem; margin-bottom: 6px; }
     .ad-empty a { color: var(--green); font-weight: 700; }
 
     @media (max-width: 1100px) {
-      .ad-stats { grid-template-columns: repeat(2, 1fr); }
-      .ad-grid, .ad-grid.even { grid-template-columns: 1fr; }
+        .ad-stats { grid-template-columns: repeat(2, 1fr); }
+        .ad-grid, .ad-grid.even { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
-      .ad-stats { gap: 10px; }
-      .ad-card { padding: 18px; }
+        .ad-stats { gap: 10px; }
+        .ad-card { padding: 18px; }
     }
-  </style>
-</head>
-<body>
-<div class="app">
-  <aside class="side">
-    <div class="brand"><span class="brand-mark"><?= ic('leaf') ?></span>AgriTrack</div>
-    <nav class="menu" aria-label="Main">
-      <?php foreach ($nav as [$href, $label, $icon]): ?>
-        <a href="<?= $href ?>" <?= $href === $current ? 'class="active" aria-current="page"' : '' ?>><?= ic($icon) ?><?= $label ?></a>
-      <?php endforeach; ?>
-    </nav>
-    <button class="signout" id="logoutBtn" type="button">Sign out</button>
-  </aside>
+</style>
+HTML;
 
-  <main class="content ad">
-    <header class="ad-head">
-      <h1>Admin dashboard</h1>
-      <p>An overview of every farmer, crop and harvest on AgriTrack.</p>
-      <p class="ad-welcome" id="welcome"></p>
-      <span class="ad-sample" id="sampleNote">Some of these figures come from sample farmers. Remove them in Manage farmers when you are done.</span>
-    </header>
+require __DIR__ . '/includes/header.php';
+?>
 
-    <div class="ad-empty" id="empty">
-      <b>No farmers yet</b>
-      Farmers show up here once they register. To try the dashboard first, open
-      <a href="manage-farmers.php">Manage farmers</a> and choose Load 12 sample farmers.
-    </div>
+        <div class="ad">
 
-    <section class="ad-stats" id="stats"></section>
+            <span class="ad-sample" id="sampleNote">Some of these figures come from sample farmers. Remove them in Manage farmers when you are done.</span>
 
-    <div class="ad-grid">
-      <section class="ad-card">
-        <h2>Harvested per month (tons)</h2>
-        <p>Last six months, all farmers combined.</p>
-        <div class="ad-chart" id="chart"></div>
-      </section>
-      <section class="ad-card">
-        <a class="ad-link" href="manage-farmers.php">Manage &rarr;</a>
-        <h2>Recently joined</h2>
-        <p>The newest farmers.</p>
-        <div class="ad-list" id="joined"></div>
-      </section>
-    </div>
+            <div class="ad-empty" id="empty">
+                <b>No farmers yet</b>
+                Farmers show up here once they register. To try the dashboard first, open
+                <a href="manage-farmers.php">Manage farmers</a> and choose Load 12 sample farmers.
+            </div>
 
-    <div class="ad-grid even">
-      <section class="ad-card">
-        <h2>Farmers by municipality</h2>
-        <p>Where your farmers are based.</p>
-        <div class="ad-bars" id="towns"></div>
-      </section>
-      <section class="ad-card">
-        <h2>Crops being grown</h2>
-        <p>Crops still in the field, by area planted.</p>
-        <div class="ad-bars" id="mix"></div>
-      </section>
-    </div>
+            <section class="ad-stats" id="stats"></section>
 
-    <section class="ad-card" style="margin-bottom:16px">
-      <h2>Farmer locations</h2>
-      <p>Each pin is a farm. Pins without a GPS fix sit near the town centre.</p>
-      <div class="ad-map" id="farmMap" role="img" aria-label="Map of farmer locations"></div>
-      <p class="ad-none" id="mapNone" style="display:none">No farmer has set a location yet. Farmers are asked for it the next time they sign in.</p>
-    </section>
+            <div class="ad-grid">
+                <section class="ad-card">
+                    <h2>Harvested per month (tons)</h2>
+                    <p>Last six months, all farmers combined.</p>
+                    <div class="ad-chart" id="chart"></div>
+                </section>
+                <section class="ad-card">
+                    <a class="ad-link" href="manage-farmers.php">Manage &rarr;</a>
+                    <h2>Recently joined</h2>
+                    <p>The newest farmers.</p>
+                    <div class="ad-list" id="joined"></div>
+                </section>
+            </div>
 
-    <div class="ad-grid even">
-      <section class="ad-card">
-        <h2>Needs attention</h2>
-        <p>Crops that are dry or almost ready to harvest.</p>
-        <div class="ad-list" id="attention"></div>
-      </section>
-      <section class="ad-card">
-        <h2>Recent activity</h2>
-        <p>The latest actions by farmers.</p>
-        <div class="ad-list" id="activity"></div>
-      </section>
-    </div>
-  </main>
-</div>
+            <div class="ad-grid even">
+                <section class="ad-card">
+                    <h2>Farmers by municipality</h2>
+                    <p>Where your farmers are based.</p>
+                    <div class="ad-bars" id="towns"></div>
+                </section>
+                <section class="ad-card">
+                    <h2>Crops being grown</h2>
+                    <p>Crops still in the field, by area planted.</p>
+                    <div class="ad-bars" id="mix"></div>
+                </section>
+            </div>
+
+            <section class="ad-card" style="margin-bottom:16px">
+                <h2>Farmer locations</h2>
+                <p>Each pin is a farm. Pins without a GPS fix sit near the town centre.</p>
+                <div class="ad-map" id="farmMap" role="img" aria-label="Map of farmer locations"></div>
+                <p class="ad-none" id="mapNone" style="display:none">No farmer has set a location yet. Farmers are asked for it the next time they sign in.</p>
+            </section>
+
+            <div class="ad-grid even">
+                <section class="ad-card">
+                    <h2>Needs attention</h2>
+                    <p>Crops that are dry or almost ready to harvest.</p>
+                    <div class="ad-list" id="attention"></div>
+                </section>
+                <section class="ad-card">
+                    <h2>Recent activity</h2>
+                    <p>The latest actions by farmers.</p>
+                    <div class="ad-list" id="activity"></div>
+                </section>
+            </div>
+
+        </div>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module" src="../assets/js/auth.js"></script>
