@@ -1444,3 +1444,61 @@ input::-webkit-contacts-auto-fill-button {
     .feature-list li  { font-size: 12px; padding: 4px 13px 4px 5px; }
     .feature-list i   { width: 25px; height: 25px; line-height: 25px; font-size: 12.5px; }
 }
+
+/* =========================================================
+   DROPDOWN FIELD (add to the very end of assets/css/style.css)
+   Gives the municipality <select> a clear arrow, a pointer cursor
+   and a grey "placeholder" colour until a town is chosen.
+   Works together with assets/js/select-dropdown.js.
+========================================================= */
+
+select.form-control {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 46px;          /* room for the arrow */
+    cursor: pointer;
+    text-overflow: ellipsis;
+}
+
+/* "Choose where your farm is" looks like a placeholder until a town is picked */
+select.form-control:required:invalid {
+    color: #86968b;
+    font-weight: 400;
+}
+
+/* the arrow */
+.input-container:has(select.form-control)::after {
+    content: "";
+    position: absolute;
+    right: 18px;
+    top: calc(50% - 7px);
+    z-index: 3;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--leaf-600);
+    border-bottom: 2px solid var(--leaf-600);
+    transform: rotate(45deg);
+    transition: transform 0.2s ease, top 0.2s ease;
+    pointer-events: none;
+}
+
+/* the arrow flips while the list is open */
+.input-container:has(select[aria-expanded="true"])::after {
+    top: calc(50% - 2px);
+    transform: rotate(-135deg);
+}
+
+/* keep the field highlighted while its list is open */
+.input-container:has(select[aria-expanded="true"]) .form-control {
+    border-color: var(--leaf-600);
+    box-shadow:
+        0 0 0 4px rgba(47, 165, 95, 0.16),
+        0 12px 24px -10px rgba(26, 131, 72, 0.35);
+}
+
+/* the real options (only seen on phones, which keep the native picker) */
+select.form-control option {
+    padding: 10px 12px;
+    color: var(--ink-900);
+    background: #ffffff;
+}
