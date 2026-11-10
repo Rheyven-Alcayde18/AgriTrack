@@ -264,6 +264,7 @@
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
     import { TOWN_COORDS, todayISO } from "./assets/js/db.js";
+    import { enhanceSelect } from "./assets/js/select-dropdown.js";
 
 
     // GET HTML ELEMENTS
@@ -292,6 +293,9 @@
         option.textContent = town;
         municipalityInput.appendChild(option);
     });
+
+    // STYLED DROPDOWN LIST (must come after the towns are added above)
+    enhanceSelect(municipalityInput);
 
     let gpsPin = null;
 
