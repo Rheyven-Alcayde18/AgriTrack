@@ -124,7 +124,9 @@ export function derive(c) {
 }
 
 /* ------------------------------------------------------------------ raw reads/writes */
-const R = (path) => ref(database, path);
+// FIX: ref(database, "") throws "path argument was an invalid path". The database root
+// must be requested with ref(database) and no path, so an empty path maps to the root.
+const R = (path) => (path ? ref(database, path) : ref(database));
 async function val(path) { const s = await get(R(path)); return s.exists() ? s.val() : null; }
 export const toList = (obj) => (obj ? Object.entries(obj).map(([id, v]) => ({ ...v, id })) : []);
 
