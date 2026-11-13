@@ -1,6 +1,8 @@
 /* assets/css/agri-ui.css
    Shared pieces used by pages that read/write Firebase: buttons, dialog, form fields, empty state, toast.
    Every class is prefixed ag- so nothing clashes with dashboard.css or the page styles. */
+
+   
 .ag-btn { font: inherit; font-size: .86rem; font-weight: 700; cursor: pointer; padding: 9px 16px; border-radius: 999px; border: 1px solid #1a9d5c; background: #1a9d5c; color: #fff; transition: background .15s, box-shadow .15s; }
 .ag-btn:hover { background: #148a4f; }
 .ag-btn:focus-visible, .ag-ghost:focus-visible, .ag-x:focus-visible { outline: 3px solid rgba(26,157,92,.35); outline-offset: 2px; }

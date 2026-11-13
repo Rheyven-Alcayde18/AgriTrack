@@ -1,0 +1,354 @@
+/* =========================================================
+   AgriTrack landing.css  (REPLACE the whole file with this)
+   ========================================================= */
+
+/* ---- Unlock page scrolling (overrides style.css) ---- */
+html {
+    scroll-behavior: smooth;
+    height: auto !important;
+    min-height: 100%;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+}
+body {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+}
+.login-wrapper {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+}
+
+/* "Learn more" link under the login card */
+.scroll-cue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+    font-weight: 700;
+    color: #12713c;
+    text-decoration: none;
+}
+.scroll-cue:hover {
+    text-decoration: underline;
+}
+
+/* ---- Info sections ---- */
+.info {
+    padding: 80px 24px;
+    background: #f6faf4;
+}
+.info.alt {
+    background: #fff;
+}
+.info-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+}
+.eyebrow {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 99px;
+    background: #e4f4e1;
+    color: #12713c;
+    font-weight: 700;
+    font-size: .85rem;
+}
+.info h2 {
+    margin: 16px 0 12px;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1.15;
+    font-weight: 800;
+    color: #0b3d26;
+}
+.lead {
+    max-width: 60ch;
+    margin: 0;
+    color: #5b7263;
+    font-size: 1.05rem;
+}
+.info-sub {
+    margin: 48px 0 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0b3d26;
+}
+
+/* ---- Cards ---- */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-top: 36px;
+}
+.info-card {
+    background: #fff;
+    border: 1px solid #d7e8d6;
+    border-radius: 20px;
+    padding: 26px;
+}
+.alt .info-card {
+    background: #f1f6ef;
+}
+.info-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    background: #e4f4e1;
+    color: #12713c;
+    font-size: 1.5rem;
+}
+.info-card h3 {
+    margin: 0 0 14px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0b3d26;
+}
+.info-card p {
+    margin: 0;
+    color: #5b7263;
+    font-size: .95rem;
+}
+.info-card p + p {
+    margin-top: 12px;
+}
+.info-card .label {
+    display: block;
+    margin-bottom: 2px;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #7a8f81;
+}
+.info-card a {
+    color: #12713c;
+    font-weight: 700;
+    word-break: break-word;
+}
+.info-card a:hover {
+    text-decoration: underline;
+}
+
+/* ---- How it works ---- */
+.steps {
+    counter-reset: step;
+}
+.step::before {
+    counter-increment: step;
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    margin-bottom: 14px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #1f9d55, #0b3d26);
+    color: #fff;
+    font-weight: 800;
+}
+
+/* ---- Footer ---- */
+.site-foot {
+    padding: 24px;
+    text-align: center;
+    background: #0b3d26;
+    color: rgba(255, 255, 255, .8);
+    font-size: .88rem;
+}
+
+/* ---- Theme toggle button ---- */
+.theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #d7e8d6;
+    border-radius: 50%;
+    background: #fff;
+    color: #12713c;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 600px) {
+    .info {
+        padding: 56px 16px;
+    }
+}
+
+/* =========================================================
+   DARK MODE  (!important so style.css cannot override it)
+   ========================================================= */
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+[data-theme="dark"] body {
+    background: #0a1a12 !important;
+    color: #dbe8df !important;
+}
+
+/* Landing sections */
+[data-theme="dark"] .info { background: #0e2218 !important; }
+[data-theme="dark"] .info.alt { background: #0a1a12 !important; }
+[data-theme="dark"] .info h2,
+[data-theme="dark"] .info-card h3,
+[data-theme="dark"] .info-sub { color: #e6f4ea !important; }
+[data-theme="dark"] .lead,
+[data-theme="dark"] .info-card p { color: #a3b8aa !important; }
+[data-theme="dark"] .info-card,
+[data-theme="dark"] .alt .info-card {
+    background: #12291d !important;
+    border-color: #1f4030 !important;
+}
+[data-theme="dark"] .info-icon,
+[data-theme="dark"] .eyebrow {
+    background: #1a3d2a !important;
+    color: #6fdc9a !important;
+}
+[data-theme="dark"] .info-card .label { color: #7a9a86 !important; }
+[data-theme="dark"] .info-card a,
+[data-theme="dark"] .scroll-cue { color: #6fdc9a !important; }
+[data-theme="dark"] .site-foot { background: #06110b !important; }
+
+/* Login panel */
+[data-theme="dark"] .form-section { background: #0a1a12 !important; }
+[data-theme="dark"] .login-card {
+    background: #12291d !important;
+    border-color: #1f4030 !important;
+    color: #dbe8df !important;
+}
+[data-theme="dark"] .login-card h1,
+[data-theme="dark"] .login-card h2,
+[data-theme="dark"] .login-card h3,
+[data-theme="dark"] .login-card .form-label,
+[data-theme="dark"] .login-card .mobile-logo {
+    color: #e6f4ea !important;
+}
+[data-theme="dark"] .login-card p,
+[data-theme="dark"] .login-card span,
+[data-theme="dark"] .login-card label,
+[data-theme="dark"] .login-card .security-note,
+[data-theme="dark"] .login-card .form-check-label,
+[data-theme="dark"] .login-card .divider span {
+    color: #a3b8aa !important;
+}
+[data-theme="dark"] .login-card .small-label { color: #6fdc9a !important; }
+[data-theme="dark"] .login-card .form-control {
+    background: #0e2218 !important;
+    border-color: #1f4030 !important;
+    color: #e6f4ea !important;
+}
+[data-theme="dark"] .login-card .form-control::placeholder { color: #6f8a78 !important; }
+[data-theme="dark"] .login-card .input-container i,
+[data-theme="dark"] .login-card .password-toggle { color: #7a9a86 !important; }
+[data-theme="dark"] .login-card a,
+[data-theme="dark"] .forgot-link,
+[data-theme="dark"] .register-link { color: #6fdc9a !important; }
+[data-theme="dark"] .divider::before,
+[data-theme="dark"] .divider::after {
+    border-color: #1f4030 !important;
+    background-color: #1f4030 !important;
+}
+
+/* ---- Login panel polish (aesthetic fixes) ---- */
+[data-theme="dark"] .form-section {
+    background:
+        radial-gradient(circle at 25% 15%, rgba(31, 157, 85, .18), transparent 55%),
+        #0a1a12 !important;
+}
+/* card becomes transparent so there is no boxed rectangle */
+[data-theme="dark"] .login-card {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+/* heading: remove gradient text, make it clearly visible */
+[data-theme="dark"] .login-card .form-heading h2 {
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: #e6f4ea !important;
+    color: #e6f4ea !important;
+}
+/* "Welcome back" pill */
+[data-theme="dark"] .login-card .small-label {
+    background: rgba(111, 220, 154, .12) !important;
+    border: 1px solid rgba(111, 220, 154, .25) !important;
+    color: #6fdc9a !important;
+}
+/* input icon squares */
+[data-theme="dark"] .login-card .input-container > i {
+    background: #1a3d2a !important;
+    color: #6fdc9a !important;
+}
+[data-theme="dark"] .login-card .form-control:focus {
+    border-color: #1f9d55 !important;
+    box-shadow: 0 0 0 3px rgba(31, 157, 85, .25) !important;
+}
+/* checkbox */
+[data-theme="dark"] .login-card .form-check-input {
+    background-color: #0e2218 !important;
+    border-color: #2c5a41 !important;
+}
+[data-theme="dark"] .login-card .form-check-input:checked {
+    background-color: #1f9d55 !important;
+    border-color: #1f9d55 !important;
+}
+/* sign in button keeps white text */
+[data-theme="dark"] .login-card .login-btn,
+[data-theme="dark"] .login-card .login-btn span {
+    color: #fff !important;
+}
+/* security note pill */
+[data-theme="dark"] .login-card .security-note {
+    background: rgba(255, 255, 255, .04) !important;
+    border: 1px solid #1f4030 !important;
+    color: #a3b8aa !important;
+}
+[data-theme="dark"] .login-card .security-note i {
+    background: transparent !important;
+    color: #6fdc9a !important;
+}
+
+/* Toggle button */
+[data-theme="dark"] .theme-toggle {
+    background: #12291d !important;
+    border-color: #1f4030 !important;
+    color: #6fdc9a !important;
+}
+
+/* ---- Cursor glow (dark mode only) ---- */
+.cursor-glow {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(111, 220, 154, .22) 0%, rgba(31, 157, 85, .10) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform;
+}
+[data-theme="dark"] .cursor-glow {
+    display: block;
+}
+@media (hover: none), (prefers-reduced-motion: reduce) {
+    .cursor-glow { display: none !important; }
+}

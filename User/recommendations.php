@@ -196,5 +196,6 @@ $current = 'recommendations.php';
 
 <script type="module" src="../assets/js/auth.js"></script>
 <script type="module" src="../assets/js/recommendations.js"></script>
+<script src="../assets/js/chatbot.js"></script>
 </body>
 </html>

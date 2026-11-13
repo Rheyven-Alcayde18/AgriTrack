@@ -182,6 +182,7 @@ $current = 'harvest-management.php';
         <h2>Preparation checklist</h2>
         <p>Tasks for your next harvests. Ticks are saved to your account.</p>
         <div id="prep"></div>
+        
       </aside>
     </div>
 
@@ -202,5 +203,6 @@ $current = 'harvest-management.php';
 
 <script type="module" src="../assets/js/auth.js"></script>
 <script type="module" src="../assets/js/harvest.js"></script>
+<script src="../assets/js/chatbot.js"></script>
 </body>
 </html>

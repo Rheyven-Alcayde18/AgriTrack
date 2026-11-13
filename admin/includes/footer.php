@@ -14,3 +14,8 @@
     </div>
 </dialog>
 <?php /* The page adds its own <script type="module"> after this include, then closes </body></html>. */ ?>
+
+<button id="gemini-float-btn" class="gemini-float-btn">
+    <i class="ph ph-sparkle"></i>
+    <span>Ask Gemini</span>
+</button>

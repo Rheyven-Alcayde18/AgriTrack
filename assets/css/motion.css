@@ -1,0 +1,49 @@
+/* AgriTrack motion: additions only, no data code touched */
+:root { --ag-ease: cubic-bezier(.22, .61, .36, 1); }
+
+@keyframes ag-rise   { from { opacity: 0; transform: translateY(14px); } }
+@keyframes ag-grow-y { from { transform: scaleY(0); } }
+@keyframes ag-grow-x { from { transform: scaleX(0); } }
+@keyframes ag-drift  { 50% { transform: translate(-24px, 20px) scale(1.12); } }
+
+/* One entrance sequence: header, stats, then cards */
+.db-head { animation: ag-rise .7s var(--ag-ease) both; }
+.db-stat { animation: ag-rise .6s var(--ag-ease) both; }
+.db-stat:nth-child(1) { animation-delay: .10s; }
+.db-stat:nth-child(2) { animation-delay: .16s; }
+.db-stat:nth-child(3) { animation-delay: .22s; }
+.db-stat:nth-child(4) { animation-delay: .28s; }
+.db-stack > .db-card { animation: ag-rise .7s var(--ag-ease) both; }
+.db-stack > .db-card:nth-child(1) { animation-delay: .30s; }
+.db-stack > .db-card:nth-child(2) { animation-delay: .40s; }
+.db-stack > .db-card:nth-child(3) { animation-delay: .50s; }
+
+/* Rows that your JS adds later (crops, harvests, tasks) fade in too */
+.db-crop, .db-next, .db-tasks li, .db-alert { animation: ag-rise .5s var(--ag-ease) both; }
+.db-crop:nth-child(2), .db-next:nth-child(2), .db-tasks li:nth-child(2) { animation-delay: .08s; }
+.db-crop:nth-child(3), .db-next:nth-child(3), .db-tasks li:nth-child(3) { animation-delay: .16s; }
+.db-crop:nth-child(4), .db-next:nth-child(4), .db-tasks li:nth-child(4) { animation-delay: .24s; }
+
+/* Bars grow from the baseline */
+.db-col .bar { transform-origin: bottom; animation: ag-grow-y .9s var(--ag-ease) .45s both; }
+.db-col:nth-child(2) .bar { animation-delay: .53s; }
+.db-col:nth-child(3) .bar { animation-delay: .61s; }
+.db-col:nth-child(4) .bar { animation-delay: .69s; }
+.db-col:nth-child(5) .bar { animation-delay: .77s; }
+.db-col:nth-child(6) .bar { animation-delay: .85s; }
+.db-bar .tr i { transform-origin: left; animation: ag-grow-x 1s var(--ag-ease) .4s both; }
+
+/* Weather glow drifts slowly */
+.db-wx::before { animation: ag-drift 9s ease-in-out infinite; }
+
+/* Hover and click feedback */
+.db-card, .db-stat { transition: box-shadow .3s var(--ag-ease), border-color .3s var(--ag-ease); }
+.db-card:hover, .db-stat:hover { box-shadow: 0 12px 30px rgba(12, 74, 48, .10); border-color: #cfe3d6; }
+.side .menu a { transition: background .25s var(--ag-ease), transform .25s var(--ag-ease); }
+.side .menu a:not(.active):hover { transform: translateX(3px); }
+.signout { transition: background .25s, transform .15s; }
+.signout:active { transform: scale(.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

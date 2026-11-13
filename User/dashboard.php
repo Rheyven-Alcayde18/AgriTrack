@@ -32,6 +32,7 @@ $current = 'dashboard.php';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="../assets/css/dashboard.css">
   <link rel="stylesheet" href="../assets/css/agri-ui.css">
   <style>
@@ -134,6 +135,40 @@ $current = 'dashboard.php';
       .db-crop .db-bar { grid-column: 1 / -1; order: 3; }
       .db-chart { gap: 8px; }
     }
+    .db-chart {
+      gap: 8px;
+    }
+
+    /* ---------- Hamburger button ---------- */
+    .side-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 46px;
+      margin-top: auto;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 12px;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+    }
+    .side-btn:hover { background: rgba(255, 255, 255, .1); }
+    .side-btn + .signout { margin-top: 0 !important; }
+
+    /* ---------- Collapsed sidebar ---------- */
+    .side { transition: width .25s ease; }
+    body.sidebar-collapsed .side { width: 84px !important; min-width: 84px !important; }
+    body.sidebar-collapsed .side .lbl { display: none; }
+    body.sidebar-collapsed .side .brand,
+    body.sidebar-collapsed .side .menu a {
+      justify-content: center;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    body.sidebar-collapsed .side .signout { font-size: 0 !important; padding: 0 !important; }
+    body.sidebar-collapsed .side .signout::before { content: "\23FB"; font-size: 1.2rem; }
   </style>
 </head>
 <body>
@@ -145,6 +180,9 @@ $current = 'dashboard.php';
         <a href="<?= $href ?>" <?= $href === $current ? 'class="active" aria-current="page"' : '' ?>><?= ic($icon) ?><?= $label ?></a>
       <?php endforeach; ?>
     </nav>
+
+    
+
     <button class="signout" id="logoutBtn" type="button">Sign out</button>
   </aside>
 
@@ -216,5 +254,8 @@ $current = 'dashboard.php';
 <script type="module" src="../assets/js/auth.js"></script>
 <script src="../assets/js/dashboard.js"></script>
 <script type="module" src="../assets/js/dashboard-farm.js"></script>
+
+
+<script src="../assets/js/chatbot.js"></script>
 </body>
 </html>
