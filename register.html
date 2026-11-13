@@ -6,6 +6,17 @@
     <meta name="description" content="Create your AgriTrack farmer account.">
     <meta name="theme-color" content="#1a8348">
     <title>Register | AgriTrack</title>
+
+    <!-- Apply saved theme BEFORE the CSS loads (prevents a white flash) -->
+    <script>
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    </script>
+
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%231a8348'/%3E%3Ctext x='50' y='68' font-size='56' text-anchor='middle'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +28,16 @@
     <link href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css" rel="stylesheet">
     <!-- Shared stylesheet -->
     <link rel="stylesheet" href="assets/css/style.css">
+    <!-- landing.css (same as the login page; must come after style.css) -->
+    <link rel="stylesheet" href="assets/css/landing.css">
 </head>
 <body>
+
+<!-- DARK MODE BUTTON -->
+<button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" aria-pressed="false">
+    <i class="ph-bold ph-moon theme-icon" aria-hidden="true"></i>
+</button>
+
 <div class="login-wrapper">
     <!-- LEFT BRAND SECTION -->
     <aside class="brand-section">
@@ -79,7 +98,7 @@
 
                 <!-- SUFFIX -->
                 <div class="mb-3">
-                    <label for="suffix" class="form-label">Suffix <span class="text-muted">(Optional)</span></label>
+                    <label for="suffix" class="form-label">Suffix <span class="text-secondary">(Optional)</span></label>
                     <div class="input-container">
                         <i class="ph-duotone ph-user" aria-hidden="true"></i>
                         <input type="text" class="form-control" id="suffix" name="suffix" placeholder="e.g. Jr., Sr., III" maxlength="20" autocomplete="honorific-suffix">
@@ -118,10 +137,11 @@
                         </select>
                     </div>
                     <div class="mt-1">
-                        <small class="d-block field-hint text-muted" id="barangayHint" aria-live="polite">
+                        <!-- Fixed contrast in dark mode by using text-secondary instead of text-muted -->
+                        <small class="d-block field-hint text-secondary" id="barangayHint" aria-live="polite">
                             Select your province and municipality to display its barangays.
                         </small>
-                        <small class="d-block field-hint text-muted mt-1" id="gpsText" aria-live="polite">
+                        <small class="d-block field-hint text-secondary mt-1" id="gpsText" aria-live="polite">
                             Your farm location is set once and cannot be changed later.
                         </small>
                         <small class="d-block field-hint mt-1">
@@ -152,7 +172,7 @@
                     <div class="strength-meter" id="strengthMeter" data-level="0" aria-hidden="true">
                         <span></span><span></span><span></span><span></span><span></span>
                     </div>
-                    <small class="field-hint" id="strengthText" aria-live="polite">
+                    <small class="field-hint text-secondary" id="strengthText" aria-live="polite">
                         Use at least 10 characters with uppercase, lowercase, a number, and a special character.
                     </small>
                 </div>
@@ -186,6 +206,9 @@
 
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- DARK MODE SCRIPT -->
+<script src="assets/js/theme.js"></script>
 
 <!-- FIREBASE REGISTRATION SCRIPT -->
 <script type="module">
@@ -294,7 +317,7 @@ async function loadProvinces() {
     try {
         const response = await fetch("https://psgc.gitlab.io/api/provinces/");
         const provinces = await response.json();
-        
+
         provinces.sort((a, b) => a.name.localeCompare(b.name)).forEach(function (prov) {
             const option = document.createElement("option");
             option.value = prov.name;
@@ -369,7 +392,7 @@ municipalityInput.addEventListener("change", async function () {
             });
             barangayInput.disabled = false;
             barangayHint.textContent = `${barangays.length} barangays available.`;
-            
+
             enhanceSelect(barangayInput);
         } else {
             barangayInput.innerHTML = '<option value="">No barangays found</option>';
@@ -390,13 +413,13 @@ document.getElementById("useGps").addEventListener("click", async function (even
         return;
     }
     gpsText.textContent = "Asking your device for its location and auto-detecting address...";
-    
+
     navigator.geolocation.getCurrentPosition(
         async function (position) {
             const lat = Math.round(position.coords.latitude * 1e5) / 1e5;
             const lon = Math.round(position.coords.longitude * 1e5) / 1e5;
             gpsPin = { lat, lon };
-            
+
             gpsText.textContent = `Exact pin saved (${lat}, ${lon}). Auto-detecting address...`;
 
             try {
@@ -413,7 +436,7 @@ document.getElementById("useGps").addEventListener("click", async function (even
 
                     if (detectedProvince) {
                         for (let i = 0; i < provinceInput.options.length; i++) {
-                            if (provinceInput.options[i].text.toLowerCase().includes(detectedProvince.toLowerCase()) || 
+                            if (provinceInput.options[i].text.toLowerCase().includes(detectedProvince.toLowerCase()) ||
                                 detectedProvince.toLowerCase().includes(provinceInput.options[i].text.toLowerCase())) {
                                 provinceInput.selectedIndex = i;
                                 provinceInput.dispatchEvent(new Event("change"));
@@ -527,7 +550,7 @@ registerForm.addEventListener("submit", async function (event) {
     const nameParts = [firstName, surname].filter(Boolean);
     const baseName = nameParts.join("");
     const fullName = baseName ? baseName + (suffix ? ", " + suffix : "") : "";
-    
+
     const province = provinceInput.value;
     const municipality = municipalityInput.value;
     const barangay = barangayInput.value.trim();
@@ -632,13 +655,13 @@ registerForm.addEventListener("submit", async function (event) {
         registerForm.reset();
         strengthMeter.dataset.level = 0;
         strengthText.textContent = "Use at least 10 characters with uppercase, lowercase, a number, and a special character.";
-        
+
         municipalityInput.innerHTML = '<option value="">Select province first</option>';
         municipalityInput.disabled = true;
         barangayInput.innerHTML = '<option value="">Select municipality / city first</option>';
         barangayInput.disabled = true;
         barangayHint.textContent = "Select your province and municipality to display its barangays.";
-        
+
         gpsPin = null;
         gpsText.textContent = "Your farm location is set once and cannot be changed later.";
 

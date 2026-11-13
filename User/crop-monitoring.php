@@ -1,22 +1,6 @@
 <?php
 // user/crop-monitoring.php
 // No sample data here. Crops come from Firebase (see assets/js/crops.js).
-<<<<<<< HEAD
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgriTrack | Crop monitoring</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/dashboard.css">
-  <link rel="stylesheet" href="css/floating-ai.css">
-  <style>
-    /* Crop monitoring page only. Classes are prefixed cm- (page) and ag- (buttons, dialogs) */
-=======
 // Same sidebar and look as the admin pages (user/includes + assets/css/admin.css).
 // The IDs and class names below are the ones crops.js draws into, so only the look changed.
 
@@ -29,7 +13,6 @@ $topActions = '<button type="button" class="btn primary" id="addCrop"><i class="
 $extraHead = <<<'HTML'
 <style>
     /* Crop monitoring page only. Classes are prefixed cm- (page) and ag- (buttons, dialogs, empty state) */
->>>>>>> origin/main
     .cm {
         --ink: var(--ink-900); --dark: var(--forest-900); --green: var(--leaf-600);
         --mint: var(--lime-100); --muted: var(--ink-600);
@@ -168,26 +151,8 @@ $extraHead = <<<'HTML'
         .cm-step { font-size: .62rem; }
         .cm-grid2 { grid-template-columns: 1fr; }
     }
-<<<<<<< HEAD
-  </style>
-</head>
-<body>
-<div class="app">
-  <aside class="side">
-    <div class="brand"><span class="brand-mark"><?= ic('leaf') ?></span>AgriTrack</div>
-    <nav class="menu" aria-label="Main">
-      <?php foreach ($nav as [$href, $label, $icon]): ?>
-        <a href="<?= $href ?>" <?= $href === $current ? 'class="active" aria-current="page"' : '' ?>><?= ic($icon) ?><?= $label ?></a>
-      <?php endforeach; ?>
-       
-    </nav>
-    <button class="signout" id="logoutBtn" type="button">Sign out</button>
-    
-  </aside>
-=======
 </style>
 HTML;
->>>>>>> origin/main
 
 require __DIR__ . '/includes/header.php';
 ?>
@@ -270,6 +235,7 @@ require __DIR__ . '/includes/header.php';
 
 <script type="module" src="../assets/js/auth.js"></script>
 <script type="module" src="../assets/js/crops.js"></script>
+
 
 <script src="../assets/js/chatbot.js"></script>
 </body>
