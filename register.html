@@ -4,72 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Create your AgriTrack farmer account.">
-    <meta name="theme-color" content="#0d4529">
-
+    <meta name="theme-color" content="#1a8348">
     <title>Register | AgriTrack</title>
-
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%231a8348'/%3E%3Ctext x='50' y='68' font-size='56' text-anchor='middle'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Phosphor Icons -->
     <link href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css" rel="stylesheet">
-
     <!-- Shared stylesheet -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body>
-
 <div class="login-wrapper">
-
     <!-- LEFT BRAND SECTION -->
     <aside class="brand-section">
-
         <div class="brand-content">
-
             <h1>
                 Start growing<br>
                 <span>smarter.</span>
             </h1>
-
             <p>
-                Join AgriTrack and manage your farming activities
-                with accessible weather information, crop monitoring,
-                and harvest management tools.
+                Join AgriTrack and manage your farming activities with accessible weather information, crop monitoring, and harvest management tools.
             </p>
-
             <div class="feature-list">
                 <div><i class="ph-duotone ph-cloud-sun" aria-hidden="true"></i> Weather forecast</div>
                 <div><i class="ph-duotone ph-plant" aria-hidden="true"></i> Crop monitoring</div>
                 <div><i class="ph-duotone ph-grains" aria-hidden="true"></i> Harvest management</div>
                 <div><i class="ph-duotone ph-hand-heart" aria-hidden="true"></i> Farmer-friendly platform</div>
             </div>
-
         </div>
-
         <footer class="brand-footer">
-            © 2026 AgriTrack. All rights reserved.
+            2026 AgriTrack. All rights reserved.
         </footer>
-
     </aside>
 
     <!-- RIGHT REGISTRATION SECTION -->
     <main class="form-section">
-
         <div class="login-card">
-
             <div class="mobile-logo">
                 <i class="ph-duotone ph-leaf" aria-hidden="true"></i>
                 AgriTrack
             </div>
-
             <div class="form-heading">
                 <span class="small-label">Create your account</span>
                 <h2>Join AgriTrack</h2>
@@ -80,186 +59,99 @@
             <div id="messageBox" class="alert d-none" role="alert" aria-live="polite"></div>
 
             <form id="registerForm">
-
                 <!-- SURNAME -->
                 <div class="mb-3">
-                    <label for="surname" class="form-label">
-                        Surname <span class="text-muted"></span>
-                    </label>
-
+                    <label for="surname" class="form-label">Surname</label>
                     <div class="input-container">
                         <i class="ph-duotone ph-user" aria-hidden="true"></i>
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="surname"
-                            name="surname"
-                            placeholder="Enter your surname"
-                            maxlength="60"
-                            autocomplete="family-name">
+                        <input type="text" class="form-control" id="surname" name="surname" placeholder="Enter your surname" maxlength="60" autocomplete="family-name">
                     </div>
                 </div>
 
                 <!-- FIRST NAME -->
                 <div class="mb-3">
-                    <label for="firstName" class="form-label">
-                        First name <span class="text-muted"></span>
-                    </label>
-
+                    <label for="firstName" class="form-label">First name</label>
                     <div class="input-container">
                         <i class="ph-duotone ph-user" aria-hidden="true"></i>
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="firstName"
-                            name="firstName"
-                            placeholder="Enter your first name"
-                            maxlength="60"
-                            autocomplete="given-name">
+                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter your first name" maxlength="60" autocomplete="given-name">
                     </div>
                 </div>
 
                 <!-- SUFFIX -->
                 <div class="mb-3">
-                    <label for="suffix" class="form-label">
-                        Suffix <span class="text-muted">(Optional)</span>
-                    </label>
-
+                    <label for="suffix" class="form-label">Suffix <span class="text-muted">(Optional)</span></label>
                     <div class="input-container">
                         <i class="ph-duotone ph-user" aria-hidden="true"></i>
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="suffix"
-                            name="suffix"
-                            placeholder="e.g. Jr., Sr., III"
-                            maxlength="20"
-                            autocomplete="honorific-suffix">
+                        <input type="text" class="form-control" id="suffix" name="suffix" placeholder="e.g. Jr., Sr., III" maxlength="20" autocomplete="honorific-suffix">
                     </div>
                 </div>
 
-                <!-- FARM MUNICIPALITY -->
+                <!-- FARM PROVINCE -->
                 <div class="mb-3">
-                    <label for="municipality" class="form-label">
-                        Farm municipality / city (Laguna)
-                    </label>
-
+                    <label for="province" class="form-label">Farm province</label>
                     <div class="input-container">
                         <i class="ph-duotone ph-map-pin" aria-hidden="true"></i>
+                        <select class="form-control" id="province" name="province" required>
+                            <option value="">Choose your province</option>
+                        </select>
+                    </div>
+                </div>
 
-                        <select
-                            class="form-control"
-                            id="municipality"
-                            name="municipality"
-                            required>
-
-                            <option value="">Choose where your farm is</option>
-
+                <!-- FARM MUNICIPALITY / CITY -->
+                <div class="mb-3">
+                    <label for="municipality" class="form-label">Farm municipality / city</label>
+                    <div class="input-container">
+                        <i class="ph-duotone ph-buildings" aria-hidden="true"></i>
+                        <select class="form-control" id="municipality" name="municipality" required disabled>
+                            <option value="">Select province first</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- FARM BARANGAY -->
                 <div class="mb-3">
-
-                    <label for="barangay" class="form-label">
-                        Farm barangay
-                    </label>
-
+                    <label for="barangay" class="form-label">Farm barangay</label>
                     <div class="input-container">
                         <i class="ph-duotone ph-house-line" aria-hidden="true"></i>
-
-                        <select
-                            class="form-control"
-                            id="barangay"
-                            name="barangay"
-                            required
-                            disabled>
-
-                            <option value="">Select municipality first</option>
-
+                        <select class="form-control" id="barangay" name="barangay" required disabled>
+                            <option value="">Select municipality / city first</option>
                         </select>
                     </div>
-
-                    <small class="field-hint" id="barangayHint" aria-live="polite">
-                        Select your municipality or city to display its barangays.
-                    </small>
-
-                    <small class="field-hint" id="gpsText" aria-live="polite">
-                        Your farm location is set once and cannot be changed later.
-                    </small>
-
-                    <small class="field-hint">
-                        <a href="#" id="useGps">
-                            Use my current location for an exact pin
-                        </a>
-                    </small>
-
+                    <div class="mt-1">
+                        <small class="d-block field-hint text-muted" id="barangayHint" aria-live="polite">
+                            Select your province and municipality to display its barangays.
+                        </small>
+                        <small class="d-block field-hint text-muted mt-1" id="gpsText" aria-live="polite">
+                            Your farm location is set once and cannot be changed later.
+                        </small>
+                        <small class="d-block field-hint mt-1">
+                            <a href="#" id="useGps">Use my current location for an exact pin</a>
+                        </small>
+                    </div>
                 </div>
 
                 <!-- EMAIL -->
                 <div class="mb-3">
-                    <label for="email" class="form-label">
-                        Email address
-                    </label>
-
+                    <label for="email" class="form-label">Email address</label>
                     <div class="input-container">
                         <i class="ph-duotone ph-envelope-simple" aria-hidden="true"></i>
-
-                        <input
-                            type="email"
-                            class="form-control"
-                            id="email"
-                            name="email"
-                            placeholder="Enter your email"
-                            required
-                            autocomplete="email"
-                            autocapitalize="off"
-                            spellcheck="false"
-                            inputmode="email">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required autocomplete="email" autocapitalize="off" spellcheck="false" inputmode="email">
                     </div>
                 </div>
 
                 <!-- PASSWORD -->
                 <div class="mb-3">
-                    <label for="password" class="form-label">
-                        Password
-                    </label>
-
+                    <label for="password" class="form-label">Password</label>
                     <div class="input-container">
                         <i class="ph-duotone ph-lock-key" aria-hidden="true"></i>
-
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="password"
-                            name="password"
-                            placeholder="Create a password"
-                            required
-                            minlength="10"
-                            autocomplete="new-password"
-                            aria-describedby="strengthText">
-
-                        <button
-                            class="password-toggle"
-                            type="button"
-                            id="togglePassword"
-                            aria-label="Show password"
-                            aria-controls="password"
-                            aria-pressed="false">
-
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required minlength="10" autocomplete="new-password" aria-describedby="strengthText">
+                        <button class="password-toggle" type="button" id="togglePassword" aria-label="Show password" aria-controls="password" aria-pressed="false">
                             <i class="ph-bold ph-eye" aria-hidden="true"></i>
-
                         </button>
                     </div>
-
                     <div class="strength-meter" id="strengthMeter" data-level="0" aria-hidden="true">
-                        <span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
                     </div>
-
                     <small class="field-hint" id="strengthText" aria-live="polite">
                         Use at least 10 characters with uppercase, lowercase, a number, and a special character.
                     </small>
@@ -267,40 +159,19 @@
 
                 <!-- CONFIRM PASSWORD -->
                 <div class="mb-4">
-                    <label for="confirmPassword" class="form-label">
-                        Confirm password
-                    </label>
-
+                    <label for="confirmPassword" class="form-label">Confirm password</label>
                     <div class="input-container">
                         <i class="ph-duotone ph-shield-check" aria-hidden="true"></i>
-
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            placeholder="Confirm your password"
-                            required
-                            minlength="10"
-                            autocomplete="new-password">
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required minlength="10" autocomplete="new-password">
                     </div>
                 </div>
 
                 <!-- SUBMIT -->
                 <button type="submit" class="register-btn" id="registerButton">
-
                     <span id="buttonText">Create account</span>
-
-                    <span
-                        id="loadingSpinner"
-                        class="spinner-border spinner-border-sm d-none"
-                        aria-hidden="true">
-                    </span>
-
+                    <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
                     <i class="ph-bold ph-arrow-right" id="buttonIcon" aria-hidden="true"></i>
-
                 </button>
-
             </form>
 
             <div class="register-section">
@@ -309,638 +180,507 @@
                     <a href="index.html" class="register-link">Sign in</a>
                 </p>
             </div>
-
         </div>
-
     </main>
-
 </div>
 
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- ==========================================
-     FIREBASE REGISTRATION SCRIPT
-========================================== -->
-
+<!-- FIREBASE REGISTRATION SCRIPT -->
 <script type="module">
+import { auth, database } from "./assets/js/firebase.js";
+import {
+    createUserWithEmailAndPassword,
+    updateProfile,
+    signOut
+} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import {
+    ref,
+    set,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { todayISO } from "./assets/js/db.js";
+import { enhanceSelect } from "./assets/js/select-dropdown.js";
 
-    import { auth, database } from "./assets/js/firebase.js";
+// GET HTML ELEMENTS
+const registerForm = document.getElementById("registerForm");
+const surnameInput = document.getElementById("surname");
+const firstNameInput = document.getElementById("firstName");
+const suffixInput = document.getElementById("suffix");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const confirmPasswordInput = document.getElementById("confirmPassword");
+const messageBox = document.getElementById("messageBox");
+const registerButton = document.getElementById("registerButton");
+const buttonText = document.getElementById("buttonText");
+const buttonIcon = document.getElementById("buttonIcon");
+const loadingSpinner = document.getElementById("loadingSpinner");
+const togglePassword = document.getElementById("togglePassword");
+const provinceInput = document.getElementById("province");
+const municipalityInput = document.getElementById("municipality");
+const barangayInput = document.getElementById("barangay");
+const barangayHint = document.getElementById("barangayHint");
+const gpsText = document.getElementById("gpsText");
+const strengthMeter = document.getElementById("strengthMeter");
+const strengthText = document.getElementById("strengthText");
 
-    import {
-        createUserWithEmailAndPassword,
-        updateProfile,
-        signOut
-    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+// SECURITY LOCKOUT TRACKER (3 TRIES / 5 MINUTE LOCKOUT)
+let failedAttempts = parseInt(localStorage.getItem("agri_fail_count") || "0", 10);
+let lockoutExpiry = parseInt(localStorage.getItem("agri_lock_until") || "0", 10);
 
-    import {
-        ref,
-        set,
-        serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-
-    import { TOWN_COORDS, todayISO } from "./assets/js/db.js";
-    import { enhanceSelect } from "./assets/js/select-dropdown.js";
-
-
-    // ==========================================
-    // LAGUNA BARANGAYS DATABASE
-    // ==========================================
-
-    const LAGUNA_BARANGAYS = {
-        "Alaminos": [
-            "Del Carmen", "Palma", "San Agustin", "San Andres", "San Fernando", 
-            "San Francisco", "San Ignacio", "San Juan", "San Miguel", "San Pedro", 
-            "Santa Rosa", "Barangay I", "Barangay II", "Barangay III", "Barangay IV"
-        ],
-        "Bay": [
-            "Aplaya", "Bitin", "Calo", "Dayap", "Maitim", "Masaya", 
-            "Paciano Rizal", "Pagalangan", "Puypuy", "San Antonio", 
-            "San Isidro", "Santa Cruz", "Santo Domingo", "Tagumpay", "Tranca"
-        ],
-        "Biñan": [
-            "Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", 
-            "Langkiwa", "Loma", "Malaban", "Malamig", "Mampalasan", "Platero", 
-            "Poblacion", "Santo Niño", "San Antonio", "San Francisco", "San Jose", 
-            "San Vicente", "Santo Tomas", "Soro-Soro", "Santo Domingo", "Timbao", 
-            "Tubigan", "Zapote"
-        ],
-        "Cabuyao": [
-            "Baclaran", "Banaybanay", "Banlic", "Bigaa", "Butong", "Casile", 
-            "Diezmo", "Gulod", "Mamatid", "Marinig", "Niugan", "Pittland", 
-            "Poblacion Uno", "Poblacion Dos", "Poblacion Tres", "Pulo", 
-            "Sala", "San Isidro"
-        ],
-        "Calamba": [
-            "Bagong Kalsada", "Bañadero", "Barandal", "Batino", "Bubuyan", 
-            "Bucal", "Bunggo", "Burol", "Camaligan", "Canlubang", "Halang", 
-            "Hornalan", "Kay-Anlog", "La Mesa", "Lawa", "Lecheria", "Lingga", 
-            "Looc", "Mabuhay", "Makiling", "Mapagong", "Mayapa", "Mercado", 
-            "Palingon", "Parian", "Princesa Kumintang", "Poblacion I", "Poblacion II", 
-            "Poblacion III", "Poblacion IV", "Poblacion V", "Poblacion VI", "Poblacion VII", 
-            "Real", "Saimsim", "Sampiruhan", "San Cristobal", "San Jose", "San Juan", 
-            "Sirang Lupa", "Sucol", "Turbina", "Ulango", "Uwisan"
-        ],
-        "Calauan": [
-            "Balayhangin", "Bangkal", "Dayap", "Hanggan", "Imok", "Kanluran", 
-            "Lamot 1", "Lamot 2", "Mabacan", "Masiit", "Paliparan", "Perez", 
-            "Prinza", "San Isidro", "Silangan", "Santo Tomas", "Balubad"
-        ],
-        "Cavinti": [
-            "Anglas", "Bangco", "Bukal", "Bulajo", "Cansuso", "Duhat", 
-            "Inao-Awan", "Labayo", "Layasin", "Layug", "Mahipon", "Paowin", 
-            "Poblacion El Salvador", "Poblacion Nabatas", "Poblacion Sumucab", 
-            "Sibat", "Tibatib", "Uguis"
-        ],
-        "Famy": [
-            "Asufre", "Banaba", "Batuhan", "Bulihan", "Caballero", "Calumpang", 
-            "Kapatalan", "Katapusan", "Liyang", "Minayutan", 
-            "Salangbato", "San Ramon", "Tunhac", "Valdovino", "Poblacion"
-        ],
-        "Kalayaan": [
-            "Longos", "San Antonio", "San Juan"
-        ],
-        "Liliw": [
-            "Bayate", "Bongkol", "Cabuyew", "Calumpang", "Dita", 
-            "Ibabang Palina", "Ibabang San Roque", "Ibabang Sungi", "Ilayang Palina", 
-            "Ilayang San Roque", "Ilayang Sungi", "Kanlurang Bukal", "Laguan", 
-            "Luquin", "Malabo-Kalutang", "Masikap", "Novaliches", "Oples", "Pag-asa", 
-            "Palayan", "Rizal", "San Isidro", "Silangang Bukal", "Tuy-Baanan", 
-            "Poblacion"
-        ],
-        "Los Baños": [
-            "Anos", "Bagong Silang", "Bambang", "Batong Malake", "Bayog", 
-            "Lalakay", "Maahas", "Malinta", "Mayondon", "Putho Tuntungin", 
-            "San Antonio", "Tadlac", "Timugan", "Poblacion"
-        ],
-        "Luisiana": [
-            "De La Paz", "San Buenaventura", "San Diego", "San Jose", "San Juan", 
-            "San Luis", "San Pablo", "San Pedro", "San Rafael", "San Roque", 
-            "San Salvador", "Santo Domingo", "Santo Tomas", "Zone I Poblacion", 
-            "Zone II Poblacion", "Zone III Poblacion", "Zone IV Poblacion", 
-            "Zone V Poblacion", "Zone VI Poblacion", "Zone VII Poblacion", 
-            "Zone VIII Poblacion"
-        ],
-        "Lumban": [
-            "Bagong Silang", "Balmis", "Cabuyao", "Caliraya", "Concepcion", 
-            "Lewin", "Maytalang I", "Maytalang II", "Pagsawitan", "Primera Parang", 
-            "Primera Pulo", "Salac", "Segunda Parang", "Segunda Pulo", "Santo Niño"
-        ],
-        "Mabitac": [
-            "Amuyong", "Bayanihan", "Luang", "Matalatala", "Nanguma", "Number 1", 
-            "Number 2", "Number 3", "Number 4", "Number 5", "Number 6", 
-            "Pag-Asa", "San Antonio", "San Jose", "Sinagtala"
-        ],
-        "Magdalena": [
-            "Alipit", "Bait", "Balanac", "Bucal", "Buenavista", "Bungkol", 
-            "Burowin", "Ibabang Atingay", "Ibabang Butnong", "Ilayang Atingay", 
-            "Ilayang Butnong", "Ilog", "Malaking Ambling", "Malinao", "Maravilla", 
-            "Munting Ambling", "Poblacion", "Salasad", "San Antonio", "Santa Maria"
-        ],
-        "Nagcarlan": [
-            "Abo", "Alibungbungan", "Allagao", "Balayhangin", "Balinacon", 
-            "Bambang", "Banago", "Banca-Banca", "Bangcuro", "Banilad", "Bayaitos", 
-            "Buboy", "Buenavista", "Buhanginan", "Bukal", "Bunga", "Cabaguin", 
-            "Calumpit", "Kanluran Kabubuhayan", "Silangan Kabubuhayan", "Kabatang", 
-            "Labne", "Lahi", "Lalacin", "Lawa", "Maiit", "Malaya", "Malinao", 
-            "Manaol", "Maravilla", "Nagcalbang", "Oplis", "Palayan", "Palina", 
-            "Sabang", "San Francisco", "Sibulan", "Silangan Napapatid", "Silangan Ilaya", 
-            "Sinipian", "Santa Lucia", "Talahib", "Talangan", "Taytay", "Tipacan", 
-            "Wakat", "Yukos", "Poblacion"
-        ],
-        "Paete": [
-            "Bagumbayan", "Bangkusay", "Ermita", "Ibaba del Sur", "Ibaba del Norte", 
-            "Ilaya del Sur", "Ilaya del Norte", "Maytoong", "Quinale", "San Jose"
-        ],
-        "Pagsanjan": [
-            "Anibong", "Biñan", "Buboy", "Cabrera", "Cansuso", "Dingin", 
-            "Lambac", "Layugan", "Magdapio", "Maulawin", "Pinagsanjan", 
-            "Poblacion I", "Poblacion II", "Sabang", "Sampaloc"
-        ],
-        "Pakil": [
-            "Baño", "Banilan", "Burgos", "Casa Real", "Casinsin", "Dorado", 
-            "Gonzales", "Kabulusan", "Matikiw", "Rizal", "Saray", "Taft", "Tavera"
-        ],
-        "Pangil": [
-            "Balian", "Isla", "Mabitac", "Natividad", "San Jose", "Sulib"
-        ],
-        "Pila": [
-            "Aplaya", "Bagong Pook", "Bukal", "Bulilan Sur", "Bulilan Norte", 
-            "Concepcion", "Labuin", "Linga", "Masico", "Mojon", "Pansol", 
-            "San Antonio", "San Jose", "Santa Clara Sur", "Santa Clara Norte", 
-            "Tubuan", "Poblacion"
-        ],
-        "Rizal": [
-            "Antipolo", "Entablado", "Laguan", "Paule 1", "Paule 2", "Pook", 
-            "Tala", "Talaga", "Tukatok", "Poblacion"
-        ],
-        "San Pablo": [
-            "Bagong Bayan", "Bautista", "Concepcion", "Del Remedios", "Dolores", 
-            "San Antonio 1", "San Antonio 2", "San Bartolome", "San Buenaventura", 
-            "San Crispin", "San Cristobal", "San Diego", "San Francisco", 
-            "San Gabriel", "San Gregorio", "San Ignacio", "San Isidro", "San Joaquin", 
-            "San Jose", "San Juan", "San Lorenzo", "San Lucas 1", "San Lucas 2", 
-            "San Marcos", "San Mateo", "San Miguel", "San Nicolas", "San Pedro", 
-            "San Rafael", "San Roque", "San Vicente", "Santa Ana", "Santa Cruz", 
-            "Santa Filomena", "Santa Isabel", "Santa Maria", "Santa Maria Magdalena", 
-            "Santa Monica", "Santa Veronica", "Santiago 1", "Santiago 2", "Santisimo Rosario", 
-            "Santo Angel", "Santo Niño", "Santo Cristo", "Soledad", "I-A", "I-B", 
-            "II-A", "II-B", "II-C", "II-D", "II-E", "II-F", "III-A", "III-B", "III-C", 
-            "III-D", "III-E", "IV-A", "IV-B", "IV-C", "V-A", "V-B", "VI-A", "VI-B", 
-            "VII-A", "VII-B"
-        ],
-        "San Pedro": [
-            "Bagong Silang", "Calendola", "Chrysanthemum", "Cuyab", "Estrella", 
-            "Fatima", "GSIS", "Landayan", "Laram", "Magsaysay", "Maharlika", 
-            "Narra", "Nueva", "Pacita 1", "Pacita 2", "Poblacion", "Rosario", 
-            "San Antonio", "San Lorenzo Ruiz", "San Roque", "San Vicente", 
-            "Sampaguita Village", "Santo Niño", "United Bayanihan", "United Better Living"
-        ],
-        "Santa Cruz": [
-            "Alipit", "Bagumbayan", "Bubukal", "Calios", "Duhat", "Gatid", 
-            "Javichuela", "Labuin", "Malinao", "Oogong", "Pagsawitan", 
-            "Palasan", "Patimbao", "Poblacion I", "Poblacion II", "Poblacion III", 
-            "Poblacion IV", "San Jose", "San Juan", "San Pablo Norte", "San Pablo Sur", 
-            "Santisima Cruz", "Santo Angel Central", "Santo Angel Norte", "Santo Angel Sur"
-        ],
-        "Santa Maria": [
-            "Bagong Pook", "Bagumbayan", "Bubucal", "Cabooan", "Calangay", 
-            "Cambuja", "Coralan", "Cansuso", "Inocencio", "Jose Laurel, Sr.", 
-            "Kayhakat", "Macasipac", "Masinao", "Matalinting", "Pao-o", 
-            "Parang Ng Buho", "Poblacion I", "Poblacion II", "Poblacion III", 
-            "Poblacion IV", "Pundin", "San Antonio", "San Pedro", "Tungao"
-        ],
-        "Santa Rosa": [
-            "Aplaya", "Balibago", "Caingit", "Dila", "Dita", "Don Jose", 
-            "Ibaba", "Kanluran", "Labas", "Macabling", "Malitlit", "Market Area", 
-            "Pook", "Sinalhan", "Tagapo", "Tatala", "Poblacion"
-        ],
-        "Siniloan": [
-            "Acevida", "Bagumdepoc", "Buhay", "G. Redor", "Gen. Luna", "Halayhayin", 
-            "Kapatalan", "Laguio", "Liyang", "Lunas", "Macatad", "Magsaysay", 
-            "P. Burgos", "Pandeño", "Salubungan", "Poblacion"
-        ],
-        "Victoria": [
-            "Bangias", "Daniw", "Masapang", "Nanhaya", "Pagalangan", "San Benito", 
-            "San Francisco", "San Roque", "San Felix"
-        ]
-    };
-
-
-    // ==========================================
-    // GET HTML ELEMENTS
-    // ==========================================
-
-    const registerForm = document.getElementById("registerForm");
-
-    const surnameInput = document.getElementById("surname");
-    const firstNameInput = document.getElementById("firstName");
-    const suffixInput = document.getElementById("suffix");
-
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const confirmPasswordInput = document.getElementById("confirmPassword");
-
-    const messageBox = document.getElementById("messageBox");
-
-    const registerButton = document.getElementById("registerButton");
-    const buttonText = document.getElementById("buttonText");
-    const buttonIcon = document.getElementById("buttonIcon");
-    const loadingSpinner = document.getElementById("loadingSpinner");
-
-    const togglePassword = document.getElementById("togglePassword");
-
-    const municipalityInput = document.getElementById("municipality");
-    const barangayInput = document.getElementById("barangay");
-    const barangayHint = document.getElementById("barangayHint");
-
-    const gpsText = document.getElementById("gpsText");
-
-    const strengthMeter = document.getElementById("strengthMeter");
-    const strengthText = document.getElementById("strengthText");
-
-
-    // ==========================================
-    // SHOW MESSAGE
-    // ==========================================
-
-    function showMessage(message, type = "danger") {
-        messageBox.textContent = message;
-        messageBox.className = "alert alert-" + type;
+function checkLockoutStatus() {
+    const now = Date.now();
+    if (lockoutExpiry && now < lockoutExpiry) {
+        const remainingMinutes = Math.ceil((lockoutExpiry - now) / 60000);
+        registerButton.disabled = true;
+        showMessage(`Too many failed attempts. Please try again in ${remainingMinutes} minute(s).`);
+        return true;
+    } else if (lockoutExpiry && now >= lockoutExpiry) {
+        localStorage.removeItem("agri_fail_count");
+        localStorage.removeItem("agri_lock_until");
+        failedAttempts = 0;
+        registerButton.disabled = false;
+        messageBox.className = "alert d-none";
     }
+    return false;
+}
+checkLockoutStatus();
 
+// SHOW MESSAGE
+function showMessage(message, type = "danger") {
+    messageBox.textContent = message;
+    messageBox.className = "alert alert-" + type;
+}
 
-    // ==========================================
-    // LOADING STATE
-    // ==========================================
+// LOADING STATE
+function setLoading(isLoading) {
+    if (checkLockoutStatus()) return;
+    registerButton.disabled = isLoading;
+    buttonText.textContent = isLoading ? "Creating account..." : "Create account";
+    loadingSpinner.classList.toggle("d-none", !isLoading);
+    buttonIcon.classList.toggle("d-none", isLoading);
+}
 
-    function setLoading(isLoading) {
-        registerButton.disabled = isLoading;
+// INVALID FIELD HANDLING
+function flagField(input) {
+    input.setAttribute("aria-invalid", "true");
+    input.focus();
+}
 
-        buttonText.textContent = isLoading
-            ? "Creating account..."
-            : "Create account";
+const formFields = [
+    surnameInput,
+    firstNameInput,
+    suffixInput,
+    provinceInput,
+    municipalityInput,
+    barangayInput,
+    emailInput,
+    passwordInput,
+    confirmPasswordInput
+];
 
-        loadingSpinner.classList.toggle("d-none", !isLoading);
-        buttonIcon.classList.toggle("d-none", isLoading);
+formFields.forEach(function (input) {
+    input.addEventListener("input", function () {
+        input.removeAttribute("aria-invalid");
+    });
+    input.addEventListener("change", function () {
+        input.removeAttribute("aria-invalid");
+    });
+});
+
+// LOAD PROVINCES (NATIONWIDE PSGC API)
+async function loadProvinces() {
+    try {
+        const response = await fetch("https://psgc.gitlab.io/api/provinces/");
+        const provinces = await response.json();
+        
+        provinces.sort((a, b) => a.name.localeCompare(b.name)).forEach(function (prov) {
+            const option = document.createElement("option");
+            option.value = prov.name;
+            option.dataset.code = prov.code;
+            option.textContent = prov.name;
+            provinceInput.appendChild(option);
+        });
+        enhanceSelect(provinceInput);
+    } catch (error) {
+        console.error("Error loading provinces:", error);
+        showMessage("Failed to load provinces. Please check your internet connection.");
     }
+}
+loadProvinces();
 
+// LOAD MUNICIPALITIES / CITIES WHEN PROVINCE CHANGES
+provinceInput.addEventListener("change", async function () {
+    const selectedOption = provinceInput.options[provinceInput.selectedIndex];
+    const provCode = selectedOption.dataset.code;
 
-    // ==========================================
-    // INVALID FIELD HANDLING
-    // ==========================================
+    municipalityInput.innerHTML = '<option value="">Choose municipality / city</option>';
+    municipalityInput.disabled = true;
+    barangayInput.innerHTML = '<option value="">Select municipality / city first</option>';
+    barangayInput.disabled = true;
+    barangayHint.textContent = "Select your municipality or city to display its barangays.";
 
-    function flagField(input) {
-        input.setAttribute("aria-invalid", "true");
-        input.focus();
-    }
+    if (!provCode) return;
 
+    try {
+        const response = await fetch(`https://psgc.gitlab.io/api/provinces/${provCode}/cities-municipalities/`);
+        const municipalities = await response.json();
 
-    const formFields = [
-        surnameInput,
-        firstNameInput,
-        suffixInput,
-        municipalityInput,
-        barangayInput,
-        emailInput,
-        passwordInput,
-        confirmPasswordInput
-    ];
-
-    formFields.forEach(function (input) {
-        input.addEventListener("input", function () {
-            input.removeAttribute("aria-invalid");
+        municipalities.sort((a, b) => a.name.localeCompare(b.name)).forEach(function (mun) {
+            const option = document.createElement("option");
+            option.value = mun.name;
+            option.dataset.code = mun.code;
+            option.textContent = mun.name;
+            municipalityInput.appendChild(option);
         });
 
-        input.addEventListener("change", function () {
-            input.removeAttribute("aria-invalid");
-        });
-    });
+        municipalityInput.disabled = false;
+        enhanceSelect(municipalityInput);
+    } catch (error) {
+        console.error("Error loading municipalities:", error);
+        showMessage("Failed to load municipalities/cities.");
+    }
+});
 
+// LOAD BARANGAYS WHEN MUNICIPALITY CHANGES
+municipalityInput.addEventListener("change", async function () {
+    const selectedOption = municipalityInput.options[municipalityInput.selectedIndex];
+    const munCode = selectedOption.dataset.code;
 
-    // ==========================================
-    // MUNICIPALITY DROPDOWN
-    // ==========================================
+    barangayInput.innerHTML = '<option value="">Choose your barangay</option>';
+    barangayInput.disabled = true;
 
-    Object.keys(TOWN_COORDS).sort().forEach(function (town) {
-        const option = document.createElement("option");
+    if (!munCode) {
+        barangayHint.textContent = "Select your municipality or city to display its barangays.";
+        return;
+    }
 
-        option.value = town;
-        option.textContent = town;
-
-        municipalityInput.appendChild(option);
-    });
-
-    enhanceSelect(municipalityInput);
-
-
-    // ==========================================
-    // LOCAL BARANGAY LOADING (NO API NEEDED)
-    // ==========================================
-
-    municipalityInput.addEventListener("change", function () {
-        const municipality = municipalityInput.value.trim();
-
-        barangayInput.innerHTML = '<option value="">Choose your barangay</option>';
-        barangayInput.disabled = true;
-
-        if (!municipality) {
-            barangayInput.innerHTML = '<option value="">Select municipality first</option>';
-            barangayHint.textContent = "Select your municipality or city to display its barangays.";
-            return;
-        }
-
-        const barangays = LAGUNA_BARANGAYS[municipality] || [];
+    try {
+        const response = await fetch(`https://psgc.gitlab.io/api/cities-municipalities/${munCode}/barangays/`);
+        const barangays = await response.json();
 
         if (barangays.length > 0) {
-            barangays.slice().sort((a, b) => a.localeCompare(b)).forEach(function (barangayName) {
+            barangays.sort((a, b) => a.name.localeCompare(b.name)).forEach(function (brgy) {
                 const option = document.createElement("option");
-                option.value = barangayName;
-                option.textContent = barangayName;
+                option.value = brgy.name;
+                option.textContent = brgy.name;
                 barangayInput.appendChild(option);
             });
-
             barangayInput.disabled = false;
-            barangayHint.textContent = `${barangays.length} barangays available in ${municipality}.`;
+            barangayHint.textContent = `${barangays.length} barangays available.`;
+            
+            enhanceSelect(barangayInput);
         } else {
             barangayInput.innerHTML = '<option value="">No barangays found</option>';
-            barangayHint.textContent = "No barangays found for this municipality.";
+            barangayHint.textContent = "No barangays found.";
         }
-    });
+    } catch (error) {
+        console.error("Error loading barangays:", error);
+        showMessage("Failed to load barangays.");
+    }
+});
 
+// GPS LOCATION & AUTO-SELECTION (REVERSE GEOCODING)
+let gpsPin = null;
+document.getElementById("useGps").addEventListener("click", async function (event) {
+    event.preventDefault();
+    if (!navigator.geolocation) {
+        gpsText.textContent = "This browser cannot share its location. Choose your address manually instead.";
+        return;
+    }
+    gpsText.textContent = "Asking your device for its location and auto-detecting address...";
+    
+    navigator.geolocation.getCurrentPosition(
+        async function (position) {
+            const lat = Math.round(position.coords.latitude * 1e5) / 1e5;
+            const lon = Math.round(position.coords.longitude * 1e5) / 1e5;
+            gpsPin = { lat, lon };
+            
+            gpsText.textContent = `Exact pin saved (${lat}, ${lon}). Auto-detecting address...`;
 
-    // ==========================================
-    // GPS LOCATION
-    // ==========================================
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, {
+                    headers: { 'Accept-Language': 'en' }
+                });
+                const data = await response.json();
 
-    let gpsPin = null;
+                if (data && data.address) {
+                    const addr = data.address;
+                    let detectedProvince = (addr.province || addr.state || "").replace("Province of ", "").trim();
+                    let detectedMun = addr.city || addr.municipality || addr.town || addr.county || "";
+                    let detectedBrgy = addr.suburb || addr.village || addr.neighbourhood || addr.hamlet || "";
 
-    document.getElementById("useGps").addEventListener("click", function (event) {
-        event.preventDefault();
+                    if (detectedProvince) {
+                        for (let i = 0; i < provinceInput.options.length; i++) {
+                            if (provinceInput.options[i].text.toLowerCase().includes(detectedProvince.toLowerCase()) || 
+                                detectedProvince.toLowerCase().includes(provinceInput.options[i].text.toLowerCase())) {
+                                provinceInput.selectedIndex = i;
+                                provinceInput.dispatchEvent(new Event("change"));
+                                break;
+                            }
+                        }
+                    }
 
-        if (!navigator.geolocation) {
-            gpsText.textContent =
-                "This browser cannot share its location. Choose your town and barangay instead.";
-            return;
-        }
+                    setTimeout(async () => {
+                        if (detectedMun) {
+                            for (let i = 0; i < municipalityInput.options.length; i++) {
+                                if (municipalityInput.options[i].text.toLowerCase().includes(detectedMun.toLowerCase()) ||
+                                    detectedMun.toLowerCase().includes(municipalityInput.options[i].text.toLowerCase())) {
+                                    municipalityInput.selectedIndex = i;
+                                    municipalityInput.dispatchEvent(new Event("change"));
+                                    break;
+                                }
+                            }
+                        }
 
-        gpsText.textContent =
-            "Asking your device for its location...";
+                        setTimeout(() => {
+                            if (detectedBrgy) {
+                                for (let i = 0; i < barangayInput.options.length; i++) {
+                                    if (barangayInput.options[i].text.toLowerCase().includes(detectedBrgy.toLowerCase()) ||
+                                        detectedBrgy.toLowerCase().includes(barangayInput.options[i].text.toLowerCase())) {
+                                        barangayInput.selectedIndex = i;
+                                        barangayInput.dispatchEvent(new Event("change"));
+                                        break;
+                                    }
+                                }
+                            }
+                            gpsText.textContent = `Location successfully auto-selected! Pin: (${lat}, ${lon}).`;
+                        }, 900);
+                    }, 900);
 
-        navigator.geolocation.getCurrentPosition(
-            function (position) {
-                gpsPin = {
-                    lat: Math.round(position.coords.latitude * 1e5) / 1e5,
-                    lon: Math.round(position.coords.longitude * 1e5) / 1e5
-                };
-
-                gpsText.textContent =
-                    "Exact pin saved (" +
-                    gpsPin.lat.toFixed(4) +
-                    ", " +
-                    gpsPin.lon.toFixed(4) +
-                    "). Also choose your town and barangay.";
-            },
-            function () {
-                gpsText.textContent =
-                    "Location was blocked. Choose your town and barangay instead.";
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000
+                } else {
+                    gpsText.textContent = `Exact pin saved (${lat}, ${lon}). Address auto-detection unavailable; please select manually.`;
+                }
+            } catch (err) {
+                console.error("Reverse geocoding error:", err);
+                gpsText.textContent = `Exact pin saved (${lat}, ${lon}). Auto-selection failed; please select manually.`;
             }
-        );
-    });
+        },
+        function () {
+            gpsText.textContent = "Location was blocked. Choose your address manually instead.";
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000
+        }
+    );
+});
 
+// PASSWORD VISIBILITY
+togglePassword.addEventListener("click", function () {
+    const isPassword = passwordInput.type === "password";
+    passwordInput.type = isPassword ? "text" : "password";
+    togglePassword.innerHTML = isPassword
+        ? '<i class="ph-bold ph-eye-slash" aria-hidden="true"></i>'
+        : '<i class="ph-bold ph-eye" aria-hidden="true"></i>';
+    togglePassword.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+    togglePassword.setAttribute("aria-pressed", isPassword ? "true" : "false");
+});
 
-    // ==========================================
-    // PASSWORD VISIBILITY
-    // ==========================================
+// ADVANCED PASSWORD SECURITY & STRENGTH CHECKER
+function evaluatePasswordStrength(password, email) {
+    if (!password) return 0;
+    const emailPrefix = email ? email.split("@")[0].toLowerCase() : "";
+    const cleanPass = password.toLowerCase();
 
-    togglePassword.addEventListener("click", function () {
-        const isPassword = passwordInput.type === "password";
+    if (password.length < 10) return 1;
+    if (/^\d+$/.test(password)) return 1;
+    if (/^[a-zA-Z]+$/.test(password)) return 1;
+    if (emailPrefix && (cleanPass === emailPrefix || cleanPass.includes(emailPrefix))) return 1;
 
-        passwordInput.type = isPassword ? "text" : "password";
+    let score = 2;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
+    if (/\d/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
 
-        togglePassword.innerHTML = isPassword
-            ? '<i class="ph-bold ph-eye-slash" aria-hidden="true"></i>'
-            : '<i class="ph-bold ph-eye" aria-hidden="true"></i>';
+    return Math.min(score, 5);
+}
 
-        togglePassword.setAttribute(
-            "aria-label",
-            isPassword ? "Hide password" : "Show password"
-        );
+passwordInput.addEventListener("input", function () {
+    const value = passwordInput.value;
+    const email = emailInput.value.trim();
+    const score = evaluatePasswordStrength(value, email);
 
-        togglePassword.setAttribute(
-            "aria-pressed",
-            isPassword ? "true" : "false"
-        );
-    });
+    const labels = [
+        "Use at least 10 characters with uppercase, lowercase, a number, and a special character.",
+        "Weak password (avoid only numbers, letters, or matching your email).",
+        "Fair password.",
+        "Good password.",
+        "Strong password!",
+        "Very strong password!"
+    ];
+    strengthMeter.dataset.level = score;
+    strengthText.textContent = labels[score] || labels[0];
+});
 
+// REGISTRATION PROCESS
+registerForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    if (checkLockoutStatus()) return;
 
-    // ==========================================
-    // PASSWORD STRENGTH METER
-    // ==========================================
+    messageBox.className = "alert d-none";
 
-    passwordInput.addEventListener("input", function () {
-        const value = passwordInput.value;
-        let score = 0;
+    const surname = surnameInput.value.trim();
+    const firstName = firstNameInput.value.trim();
+    const suffix = suffixInput.value.trim();
+    const nameParts = [firstName, surname].filter(Boolean);
+    const baseName = nameParts.join("");
+    const fullName = baseName ? baseName + (suffix ? ", " + suffix : "") : "";
+    
+    const province = provinceInput.value;
+    const municipality = municipalityInput.value;
+    const barangay = barangayInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
 
-        if (value.length >= 6) score++;
-        if (value.length >= 10) score++;
-        if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score++;
-        if (/\d/.test(value) && /[^A-Za-z0-9]/.test(value)) score++;
+    if (!province) {
+        showMessage("Please choose a valid province.");
+        flagField(provinceInput);
+        return;
+    }
+    if (!municipality) {
+        showMessage("Please choose a valid municipality or city.");
+        flagField(municipalityInput);
+        return;
+    }
+    if (!barangay || barangayInput.disabled) {
+        showMessage("Please select a valid barangay.");
+        flagField(barangayInput);
+        return;
+    }
+    if (!email || !email.includes("@") || !email.includes(".")) {
+        showMessage("Please enter a valid email address (e.g., name@gmail.com).");
+        flagField(emailInput);
+        return;
+    }
 
-        if (!value) score = 0;
+    // STRICT PASSWORD SECURITY VALIDATION ON SUBMIT
+    const emailPrefix = email.split("@")[0].toLowerCase();
+    const cleanPass = password.toLowerCase();
 
-        const labels = [
-            "Use at least 10 characters with uppercase, lowercase, a number, and a special character.",
-            "Weak password.",
-            "Fair password.",
-            "Good password.",
-            "Strong password!"
-        ];
+    const isStrongPassword =
+        password.length >= 10 &&
+        /[A-Z]/.test(password) &&
+        /[a-z]/.test(password) &&
+        /\d/.test(password) &&
+        /[^A-Za-z0-9]/.test(password) &&
+        !/^\d+$/.test(password) &&
+        !/^[a-zA-Z]+$/.test(password) &&
+        !(emailPrefix && (cleanPass === emailPrefix || cleanPass.includes(emailPrefix)));
 
-        strengthMeter.dataset.level = score;
-        strengthText.textContent = labels[score];
-    });
-
-
-    // ==========================================
-    // REGISTRATION PROCESS
-    // ==========================================
-
-    registerForm.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        messageBox.className = "alert d-none";
-
-        const surname = surnameInput.value.trim();
-        const firstName = firstNameInput.value.trim();
-        const suffix = suffixInput.value.trim();
-
-        const nameParts = [firstName, surname].filter(Boolean);
-        const baseName = nameParts.join(" ");
-        const fullName = baseName
-            ? baseName + (suffix ? ", " + suffix : "")
-            : "";
-
-        const municipality = municipalityInput.value;
-        const barangay = barangayInput.value.trim();
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-
-        if (!municipality || !TOWN_COORDS[municipality]) {
-            showMessage("Please choose a valid municipality or city.");
-            flagField(municipalityInput);
+    if (!isStrongPassword) {
+        failedAttempts++;
+        if (failedAttempts >= 3) {
+            lockoutExpiry = Date.now() + 5 * 60 * 1000; // 5 minute lock
+            localStorage.setItem("agri_fail_count", failedAttempts);
+            localStorage.setItem("agri_lock_until", lockoutExpiry);
+            showMessage("Too many weak or invalid attempts (3/3). Please try again in 5 minutes.");
+            registerButton.disabled = true;
             return;
         }
 
-        if (!barangay || barangayInput.disabled) {
-            showMessage("Please select a valid barangay.");
-            flagField(barangayInput);
-            return;
+        showMessage(`Please use a strong password (attempt ${failedAttempts}/3). Must have 10+ chars, uppercase, lowercase, numbers, special characters, and not match your email.`);
+        flagField(passwordInput);
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        showMessage("Passwords do not match.");
+        flagField(confirmPasswordInput);
+        return;
+    }
+
+    const latitude = gpsPin ? gpsPin.lat : 12.8797;
+    const longitude = gpsPin ? gpsPin.lon : 121.7740;
+
+    setLoading(true);
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const accountName = fullName || email.split("@")[0] || "Farmer";
+
+        await updateProfile(user, {
+            displayName: accountName
+        });
+
+        await set(ref(database, "users/" + user.uid), {
+            name: accountName,
+            fullName: fullName,
+            surname: surname,
+            firstName: firstName,
+            suffix: suffix,
+            email: email,
+            role: "user",
+            status: "active",
+            joined: todayISO(),
+            createdAt: serverTimestamp(),
+            province: province,
+            municipality: municipality,
+            barangay: barangay,
+            lat: latitude,
+            lon: longitude,
+            locationSource: gpsPin ? "gps" : "manual"
+        });
+
+        localStorage.removeItem("agri_fail_count");
+        localStorage.removeItem("agri_lock_until");
+
+        await signOut(auth);
+        showMessage("Registration successful! Redirecting to login...", "success");
+        registerForm.reset();
+        strengthMeter.dataset.level = 0;
+        strengthText.textContent = "Use at least 10 characters with uppercase, lowercase, a number, and a special character.";
+        
+        municipalityInput.innerHTML = '<option value="">Select province first</option>';
+        municipalityInput.disabled = true;
+        barangayInput.innerHTML = '<option value="">Select municipality / city first</option>';
+        barangayInput.disabled = true;
+        barangayHint.textContent = "Select your province and municipality to display its barangays.";
+        
+        gpsPin = null;
+        gpsText.textContent = "Your farm location is set once and cannot be changed later.";
+
+        setTimeout(function () {
+            window.location.href = "index.html";
+        }, 1800);
+    } catch (error) {
+        console.error("Registration Error:", error);
+        let errorMessage = "Registration failed. Please try again.";
+        let fieldToFlag = null;
+
+        switch (error.code) {
+            case "auth/email-already-in-use":
+                errorMessage = "This email address is already registered.";
+                fieldToFlag = emailInput;
+                break;
+            case "auth/invalid-email":
+                errorMessage = "Please enter a valid email address.";
+                fieldToFlag = emailInput;
+                break;
+            case "auth/weak-password":
+                errorMessage = "Your password is too weak.";
+                fieldToFlag = passwordInput;
+                break;
+            case "auth/network-request-failed":
+                errorMessage = "Network error. Check your internet connection.";
+                break;
+            case "PERMISSION_DENIED":
+            case "database/permission-denied":
+                errorMessage = "Account authentication succeeded, but saving the profile was blocked by database rules. Contact the administrator.";
+                break;
         }
-
-        if (!email) {
-            showMessage("Please enter your email address.");
-            flagField(emailInput);
-            return;
+        showMessage(errorMessage);
+        if (fieldToFlag) {
+            flagField(fieldToFlag);
         }
+    } finally {
+        setLoading(false);
+    }
+});
 
-        if (password.length < 10) {
-            showMessage("Password must contain at least 10 characters.");
-            flagField(passwordInput);
-            return;
-        }
-
-        const isStrongPassword =
-            password.length >= 10 &&
-            /[A-Z]/.test(password) &&
-            /[a-z]/.test(password) &&
-            /\d/.test(password) &&
-            /[^A-Za-z0-9]/.test(password);
-
-        if (!isStrongPassword) {
-            showMessage(
-                "Please use a strong password with at least 10 characters, uppercase and lowercase letters, a number, and a special character."
-            );
-            flagField(passwordInput);
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            showMessage("Passwords do not match.");
-            flagField(confirmPasswordInput);
-            return;
-        }
-
-        const town = TOWN_COORDS[municipality];
-        const latitude = gpsPin ? gpsPin.lat : town[0];
-        const longitude = gpsPin ? gpsPin.lon : town[1];
-
-        setLoading(true);
-
-        try {
-            const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-
-            const user = userCredential.user;
-            const accountName = fullName || email.split("@")[0] || "Farmer";
-
-            await updateProfile(user, {
-                displayName: accountName
-            });
-
-            await set(ref(database, "users/" + user.uid), {
-                name: accountName,
-                fullName: fullName,
-                surname: surname,
-                firstName: firstName,
-                suffix: suffix,
-                email: email,
-                role: "user",
-                status: "active",
-                joined: todayISO(),
-                createdAt: serverTimestamp(),
-                municipality: municipality,
-                barangay: barangay,
-                lat: latitude,
-                lon: longitude,
-                locationSource: gpsPin ? "gps" : "town"
-            });
-
-            await signOut(auth);
-
-            showMessage(
-                "Registration successful! Redirecting to login...",
-                "success"
-            );
-
-            registerForm.reset();
-
-            strengthMeter.dataset.level = 0;
-            strengthText.textContent =
-                "Use at least 10 characters with uppercase, lowercase, a number, and a special character.";
-
-            barangayInput.innerHTML =
-                '<option value="">Select municipality first</option>';
-            barangayInput.disabled = true;
-            barangayHint.textContent =
-                "Select your municipality or city to display its barangays.";
-
-            gpsPin = null;
-            gpsText.textContent =
-                "Your farm location is set once and cannot be changed later.";
-
-            setTimeout(function () {
-                window.location.href = "index.html";
-            }, 1800);
-
-        } catch (error) {
-            console.error("Registration Error:", error);
-
-            let errorMessage = "Registration failed. Please try again.";
-            let fieldToFlag = null;
-
-            switch (error.code) {
-                case "auth/email-already-in-use":
-                    errorMessage = "This email address is already registered.";
-                    fieldToFlag = emailInput;
-                    break;
-                case "auth/invalid-email":
-                    errorMessage = "Please enter a valid email address.";
-                    fieldToFlag = emailInput;
-                    break;
-                case "auth/weak-password":
-                    errorMessage = "Your password is too weak.";
-                    fieldToFlag = passwordInput;
-                    break;
-                case "auth/network-request-failed":
-                    errorMessage = "Network error. Check your internet connection.";
-                    break;
-                case "PERMISSION_DENIED":
-                case "database/permission-denied":
-                    errorMessage = "Account authentication succeeded, but saving the profile was blocked by database rules. Contact the administrator.";
-                    break;
-            }
-
-            showMessage(errorMessage);
-
-            if (fieldToFlag) {
-                flagField(fieldToFlag);
-            }
-
-        } finally {
-            setLoading(false);
-        }
-    });
-
-    console.log("AgriTrack Registration Page Loaded.");
-
+console.log("AgriTrack Registration Page Loaded.");
 </script>
-
 </body>
 </html>
