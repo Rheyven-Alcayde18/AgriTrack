@@ -32,7 +32,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-.layout { display: grid; grid-template-columns: 252px 1fr; min-height: 100vh; }
+.layout { display: grid; grid-template-columns: var(--nav-w, 252px) 1fr; min-height: 100vh; }
 
 /* ---------- sidebar ---------- */
 .sidebar {
@@ -41,6 +41,7 @@ body {
     padding: 22px 16px;
     color: #dff0e4;
     background: linear-gradient(180deg, var(--forest-800), var(--forest-900));
+    overflow: hidden; white-space: nowrap;
 }
 .brand {
     display: flex; align-items: center; gap: 10px;
@@ -265,8 +266,42 @@ select.input { cursor: pointer; }
     box-shadow: 0 12px 30px rgba(0, 0, 0, .25);
 }
 
+/* ---------- collapse button: a small round button on the sidebar's edge ---------- */
+.nav-toggle {
+    position: fixed; top: 26px; left: calc(var(--nav-w, 252px) - 15px); z-index: 40;
+    width: 30px; height: 30px; padding: 0;
+    display: grid; place-items: center; cursor: pointer;
+    color: var(--forest-800); background: #fff;
+    border: 1px solid var(--line); border-radius: 50%;
+    box-shadow: 0 6px 16px -6px rgba(8, 48, 29, .5);
+    transition: left .25s cubic-bezier(.2, .8, .2, 1), background .2s, color .2s, transform .2s;
+}
+.nav-toggle:hover { background: var(--lime-100); color: var(--leaf-700); transform: scale(1.08); }
+.nav-toggle:focus-visible, .nav a:focus-visible, .logout:focus-visible { outline: 3px solid rgba(139, 214, 63, .7); outline-offset: 2px; }
+.nav-toggle i { font-size: 13px; line-height: 1; transition: transform .25s ease; }
+.nav-toggle span { display: none; }
+
+/* ---------- collapsed sidebar (desktop only; remembered between pages) ---------- */
+@media (min-width: 861px) {
+    html { --nav-w: 252px; }
+    html.nav-collapsed { --nav-w: 76px; }
+
+    .layout { transition: grid-template-columns .25s cubic-bezier(.2, .8, .2, 1); }
+
+    html.nav-collapsed .sidebar { padding-left: 12px; padding-right: 12px; }
+    html.nav-collapsed .brand { justify-content: center; padding: 4px 0 20px; }
+    html.nav-collapsed .brand-name,
+    html.nav-collapsed .nav a span,
+    html.nav-collapsed .logout span { display: none; }
+    html.nav-collapsed .nav a,
+    html.nav-collapsed .logout { justify-content: center; padding-left: 0; padding-right: 0; }
+    html.nav-collapsed .nav a.active { box-shadow: inset 0 0 0 1px rgba(139, 214, 63, .5); }
+    html.nav-collapsed .nav-toggle i { transform: rotate(180deg); }
+}
+
 /* ---------- responsive ---------- */
 @media (max-width: 860px) {
+    .nav-toggle { display: none; }
     .layout { grid-template-columns: 1fr; }
     .sidebar {
         position: static; height: auto; flex-direction: row; align-items: center; flex-wrap: wrap;
