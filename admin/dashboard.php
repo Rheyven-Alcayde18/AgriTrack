@@ -219,5 +219,6 @@ require __DIR__ . '/includes/header.php';
 <script src="../assets/js/theme.js"></script>
 <script type="module" src="../assets/js/auth.js"></script>
 <script type="module" src="../assets/js/admin-dashboard.js"></script>
+<script src="../assets/js/chatbot.js"></script>
 </body>
 </html>

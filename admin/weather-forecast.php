@@ -242,5 +242,6 @@ require __DIR__ . '/includes/header.php';
 </script>
 <script type="module" src="../assets/js/weather.js"></script>
 <script type="module" src="../assets/js/admin-weather.js"></script>
+<script src="../assets/js/chatbot.js"></script>
 </body>
 </html>
